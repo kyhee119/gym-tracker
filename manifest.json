@@ -15,5 +15,6 @@
       "purpose": "any maskable"
     }
   ],
-  "scope": "/gym-tracker/"
+  "scope": "/gym-tracker/",
+  "id": "/gym-tracker/"
 }
