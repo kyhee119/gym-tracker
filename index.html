@@ -1145,7 +1145,7 @@ function renderCalendar(){
     var isSel = calSelected===dateStr;
     var cls = 'cal-day'+(isToday?' today':'')+(isSel?' selected':'');
     var dotsHTML = cats.map(function(c){ return '<div class="cat-dot '+CAT_CLS[c]+'"></div>'; }).join('');
-    html += '<div class="'+cls+'" onclick="selectDay(''+dateStr+'')">'
+    html += '<div class="'+cls+'" onclick="selectDay(\'' + dateStr + '\')">'
       +'<div class="dn">'+d+'</div>'
       +'<div class="cats">'+dotsHTML+'</div>'
       +'</div>';
