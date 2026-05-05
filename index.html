@@ -958,7 +958,7 @@ updateDisplay();
 // ── 서버 저장 & 공유 & 보기모드 ══════════════════
 var IS_VIEW = false;
 var BIN_ID = null;
-var JKEY = '$2a$10$BpXdFuFNpzJ2x9AD2Nu5/.jjXcp6GL/V7kUYfl32Aw5y1W6..sQlC';
+var JKEY = '$2a$10$zMvPTK5WJXfRPW5lt3sfQuV7GSwBuK8kxfxmyqldyM1wVK5V9ldji';
 var BASE = 'https://api.jsonbin.io/v3';
 
 function showToast(msg, dur) {
@@ -1145,7 +1145,7 @@ function renderCalendar(){
     var isSel = calSelected===dateStr;
     var cls = 'cal-day'+(isToday?' today':'')+(isSel?' selected':'');
     var dotsHTML = cats.map(function(c){ return '<div class="cat-dot '+CAT_CLS[c]+'"></div>'; }).join('');
-    html += '<div class="'+cls+'" onclick="selectDay(\'' + dateStr + '\')">'
+    html += '<div class="'+cls+'" onclick="selectDay(''+dateStr+'')">'
       +'<div class="dn">'+d+'</div>'
       +'<div class="cats">'+dotsHTML+'</div>'
       +'</div>';
@@ -1227,7 +1227,7 @@ function calMove(dir){
 
 
 // ── PWA
-// serviceWorker disabled for GitHub Pages subpath
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}
 
 // ── 초기화
 initViewMode();
