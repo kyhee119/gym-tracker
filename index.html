@@ -1123,7 +1123,24 @@ function initViewMode(){
   fetch(BASE+'/b/'+binId+'/latest',{headers:{'X-Master-Key':JKEY}}).then(function(r){return r.json();}).then(function(r){
     if(r.record){var d=r.record;if(d.workouts)workouts=d.workouts;if(d.cardios)cardios=d.cardios;if(d.bodies)bodies=d.bodies;if(d.nutMeals)nutMeals=d.nutMeals;if(d.myInfo)myInfo=d.myInfo;if(d.savedFoods)savedFoods=d.savedFoods;}
     renderWorkouts();renderCardio();renderBody();renderBodyInfo();renderNutToday();
+    patchViewMode();
   }).catch(function(){showToast('⚠️ 데이터 불러오기 실패');});
+}
+function patchViewMode(){
+  if(!IS_VIEW) return;
+  // 입력 폼 카드 전체 숨기기 (bsave 버튼 있는 카드)
+  document.querySelectorAll('.card').forEach(function(c){
+    if(c.querySelector('.bsave') || c.querySelector('.badd')) c.style.display='none';
+  });
+  // 삭제 버튼 숨기기
+  document.querySelectorAll('.bdels,.bdel').forEach(function(b){b.style.display='none';});
+  // 내 정보 수정 버튼 숨기기
+  var editBtn=document.getElementById('edit-btn');
+  if(editBtn) editBtn.style.display='none';
+  // 영양 서브탭에서 식사추가/저장음식 탭 숨기기
+  document.querySelectorAll('.stab').forEach(function(b,i){
+    if(b.textContent.indexOf('식사')!==-1||b.textContent.indexOf('저장')!==-1) b.style.display='none';
+  });
 }
 function shareData(){
   serverSave();
