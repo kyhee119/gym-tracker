@@ -716,6 +716,7 @@ function updateTot(){
   else{var t=setRows.reduce(function(s,r){return s+(r.kg&&r.reps?parseFloat(r.kg)*parseInt(r.reps):0);},0);el.innerHTML=t?'총 <span>'+fmt(t)+'kg</span>':'—';}
 }
 function saveWorkout(){
+  if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}
   var date=document.getElementById('w-date').value,ex=document.getElementById('w-ex').value,err=document.getElementById('w-err'),type=exType(ex);
   if(!date||!ex){err.textContent='날짜와 종목을 선택해주세요.';return;}
   if(!setRows.length){err.textContent='세트를 추가해주세요.';return;}
@@ -730,7 +731,7 @@ function saveWorkout(){
   document.getElementById('w-ex').value='';document.getElementById('ex-notice').style.display='none';
   if(!IS_VIEW)serverSave();flash();renderWorkouts();
 }
-function delW(id){if(!confirm('삭제할까요?'))return;workouts=workouts.filter(function(w){return w.id!==id;});sv(WK,workouts);if(!IS_VIEW)serverSave();renderWorkouts();}
+function delW(id){if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}if(!confirm('삭제할까요?'))return;workouts=workouts.filter(function(w){return w.id!==id;});sv(WK,workouts);if(!IS_VIEW)serverSave();renderWorkouts();}
 function renderWorkouts(){
   var el=document.getElementById('w-list'),groups={};
   workouts.forEach(function(w){if(!groups[w.ex])groups[w.ex]=[];groups[w.ex].push(w);});
@@ -764,6 +765,7 @@ function cardioPreview(){
   else if(t==='cycle'){var res=parseInt(document.getElementById('c-resistance').value)||0,min=parseFloat(document.getElementById('c-ctime').value)||0,dist=parseFloat(document.getElementById('c-cdist').value)||0;if(res&&min){box.style.display='';box.innerHTML='저항 <strong style="color:var(--orange)">Lv.'+res+'</strong> · <strong style="color:var(--green)">'+min+'분</strong>'+(dist?' · '+dist+'km':'');}else box.style.display='none';}
 }
 function saveCardio(){
+  if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}
   var date=document.getElementById('c-date').value,type=document.getElementById('c-type').value,err=document.getElementById('c-err');
   if(!date||!type){err.textContent='날짜와 종류를 선택해주세요.';return;}
   var entry={id:Date.now(),date:date,type:type};
@@ -776,7 +778,7 @@ function saveCardio(){
   ['c-incline','c-speed','c-time','c-level','c-stime','c-resistance','c-ctime','c-cdist'].forEach(function(id){document.getElementById(id).value='';});
   if(!IS_VIEW)serverSave();flash();renderCardio();
 }
-function delC(id){if(!confirm('삭제할까요?'))return;cardios=cardios.filter(function(c){return c.id!==id;});sv(CK,cardios);if(!IS_VIEW)serverSave();renderCardio();}
+function delC(id){if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}if(!confirm('삭제할까요?'))return;cardios=cardios.filter(function(c){return c.id!==id;});sv(CK,cardios);if(!IS_VIEW)serverSave();renderCardio();}
 function renderCardio(){
   var el=document.getElementById('c-list');
   if(!cardios.length){el.innerHTML='<div class="empty">🏃<br>유산소 기록이 없어요</div>';return;}
@@ -885,15 +887,15 @@ function renderNutToday(){
     return '<div class="meal-row"><div class="meal-top"><span style="font-size:.8rem;font-weight:700;">'+item.name+'</span><span style="display:flex;align-items:center;gap:5px;"><span style="font-size:.73rem;font-weight:700;color:var(--yellow);">'+Math.round(item.kcal)+'kcal</span>'+(IS_VIEW?'':'<button class="bdels" onclick="delMeal('+i+')">✕</button>')+'</span></div><div class="meal-macros"><div class="mm"><span class="mml">P </span><span style="color:var(--blue);">'+Math.round(item.prot*10)/10+'g</span></div><div class="mm"><span class="mml">C </span><span style="color:var(--orange);">'+Math.round(item.carb*10)/10+'g</span></div><div class="mm"><span class="mml">F </span><span style="color:var(--purple);">'+Math.round(item.fat*10)/10+'g</span></div></div></div>';
   }).join('');
 }
-function delMeal(i){var k=dateKey(nutDate);if(nutMeals[k])nutMeals[k].splice(i,1);sv(NK,nutMeals);if(!IS_VIEW)serverSave();renderNutToday();}
+function delMeal(i){if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}var k=dateKey(nutDate);if(nutMeals[k])nutMeals[k].splice(i,1);sv(NK,nutMeals);if(!IS_VIEW)serverSave();renderNutToday();}
 
-function setNutMode(mode,btn){
+function setNutMode(mode,btn){if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}
   nutMode=mode;
   document.querySelectorAll('.mode-btn').forEach(function(b){b.classList.remove('on');b.style.borderColor='';b.style.color='';});
   btn.classList.add('on');btn.style.borderColor=NUT_MODES[mode].color;btn.style.color=NUT_MODES[mode].color;
   renderNutGoal();renderNutToday();
 }
-function setNutWorkout(val,btn){nutWorkout=val;document.querySelectorAll('.wt-btn').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');renderNutGoal();renderNutToday();}
+function setNutWorkout(val,btn){if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}nutWorkout=val;document.querySelectorAll('.wt-btn').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');renderNutGoal();renderNutToday();}
 
 function renderNutGoal(){
   var g=calcNutGoals(),m=NUT_MODES[nutMode];
@@ -920,6 +922,7 @@ function calcFromGram(){
   document.getElementById('food-kcal').value=kcal;document.getElementById('food-prot').value=prot;document.getElementById('food-carb').value=carb;document.getElementById('food-fat').value=fat;
 }
 function addMeal(){
+  if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}
   var name=document.getElementById('food-name').value,kcal=parseFloat(document.getElementById('food-kcal').value)||0,prot=parseFloat(document.getElementById('food-prot').value)||0,carb=parseFloat(document.getElementById('food-carb').value)||0,fat=parseFloat(document.getElementById('food-fat').value)||0,err=document.getElementById('n-err');
   if(!name){err.textContent='음식명을 입력해주세요.';return;}
   err.textContent='';
@@ -933,7 +936,7 @@ function addMeal(){
   switchNut('today',document.querySelector('.stab'));
   renderNutToday();
 }
-function saveFood(){
+function saveFood(){if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}
   var name=document.getElementById('sf-name').value,cat=document.getElementById('sf-cat').value,kcal=parseFloat(document.getElementById('sf-kcal').value)||0,prot=parseFloat(document.getElementById('sf-prot').value)||0,carb=parseFloat(document.getElementById('sf-carb').value)||0,fat=parseFloat(document.getElementById('sf-fat').value)||0;
   if(!name){alert('음식명을 입력해주세요!');return;}
   savedFoods.push({name:name,cat:cat,kcal:kcal,prot:prot,carb:carb,fat:fat});
@@ -1019,7 +1022,7 @@ function liveCalc(){
   document.getElementById('live-tdee').textContent=tdeeW.toLocaleString();
   document.getElementById('live-prot').textContent=prot;
 }
-function saveInfo(){
+function saveInfo(){if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}
   myInfo={h:parseFloat(document.getElementById('inp-h').value)||170,age:parseInt(document.getElementById('inp-age').value)||30,gender:document.getElementById('inp-gender').value,act:parseFloat(document.getElementById('inp-act').value)||1.55};
   sv(IK,myInfo);toggleInfoEdit();renderBodyInfo();flash();
 }
@@ -1047,13 +1050,14 @@ function renderBodyInfo(){
 // ══ 체성분
 function bPrev(){var bw=parseFloat(document.getElementById('b-bw').value)||0,f=parseFloat(document.getElementById('b-fat').value)||0,w=document.getElementById('b-prev');if(bw>0&&f>0){w.style.display='';var fr=(f/bw*100).toFixed(1);document.getElementById('b-fr').textContent=fr+'%';document.getElementById('b-fr').style.color=fr<15?'var(--green)':fr<20?'var(--yellow)':fr<25?'var(--orange)':'var(--red)';}else w.style.display='none';}
 function saveBody(){
+  if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}
   var date=document.getElementById('b-date').value,bw=parseFloat(document.getElementById('b-bw').value),muscle=parseFloat(document.getElementById('b-muscle').value)||null,fat=parseFloat(document.getElementById('b-fat').value)||null,err=document.getElementById('b-err');
   if(!date||!bw){err.textContent='날짜와 체중은 필수입니다.';return;}
   err.textContent='';bodies.push({id:Date.now(),date:date,bw:bw,muscle:muscle,fat:fat});sv(BK,bodies);
   ['b-bw','b-muscle','b-fat'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('b-prev').style.display='none';
   if(!IS_VIEW)serverSave();flash();renderBodyInfo();renderBody();
 }
-function delB(id){if(!confirm('삭제할까요?'))return;bodies=bodies.filter(function(b){return b.id!==id;});sv(BK,bodies);if(!IS_VIEW)serverSave();renderBody();}
+function delB(id){if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}if(!confirm('삭제할까요?'))return;bodies=bodies.filter(function(b){return b.id!==id;});sv(BK,bodies);if(!IS_VIEW)serverSave();renderBody();}
 function renderRangeSummary(){
   var fromDate=document.getElementById('b-from').value,toDate=document.getElementById('b-to').value,el=document.getElementById('b-range-result');
   if(!fromDate||!toDate||fromDate===toDate){el.innerHTML='<div style="color:var(--sub);font-size:.78rem;">날짜를 선택해주세요.</div>';return;}
@@ -1117,7 +1121,23 @@ function serverLoad(cb){
 }
 function initViewMode(){
   var params=new URLSearchParams(window.location.search),binId=params.get('share');
-  if(!binId){document.getElementById('share-btn').style.display='';serverLoad(function(data){if(data.workouts)workouts=data.workouts;if(data.cardios)cardios=data.cardios;if(data.bodies)bodies=data.bodies;if(data.nutMeals)nutMeals=data.nutMeals;if(data.myInfo)myInfo=data.myInfo;if(data.savedFoods)savedFoods=data.savedFoods;renderWorkouts();renderCardio();renderBody();renderBodyInfo();renderNutToday();showToast('☁️ 서버에서 불러왔어요!');});return;}
+  if(!binId){
+    document.getElementById('share-btn').style.display='';
+    // 로컬 데이터 먼저 즉시 렌더링
+    renderWorkouts();renderCardio();renderBody();renderBodyInfo();renderNutToday();
+    // 백그라운드로 서버 동기화
+    serverLoad(function(data){
+      var changed=false;
+      if(data.workouts&&JSON.stringify(data.workouts)!==JSON.stringify(workouts)){workouts=data.workouts;sv(WK,workouts);changed=true;}
+      if(data.cardios&&JSON.stringify(data.cardios)!==JSON.stringify(cardios)){cardios=data.cardios;sv(CK,cardios);changed=true;}
+      if(data.bodies&&JSON.stringify(data.bodies)!==JSON.stringify(bodies)){bodies=data.bodies;sv(BK,bodies);changed=true;}
+      if(data.nutMeals&&JSON.stringify(data.nutMeals)!==JSON.stringify(nutMeals)){nutMeals=data.nutMeals;sv(NK,nutMeals);changed=true;}
+      if(data.myInfo&&JSON.stringify(data.myInfo)!==JSON.stringify(myInfo)){myInfo=data.myInfo;sv(IK,myInfo);changed=true;}
+      if(data.savedFoods&&JSON.stringify(data.savedFoods)!==JSON.stringify(savedFoods)){savedFoods=data.savedFoods;sv(FK,savedFoods);changed=true;}
+      if(changed){renderWorkouts();renderCardio();renderBody();renderBodyInfo();renderNutToday();showToast('☁️ 최신 데이터로 업데이트됐어요!');}
+    });
+    return;
+  }
   IS_VIEW=true;document.getElementById('view-banner').style.display='';document.getElementById('share-btn').style.display='none';
   showToast('⏳ 기록 불러오는 중...',1500);
   fetch(BASE+'/b/'+binId+'/latest',{headers:{'X-Master-Key':JKEY}}).then(function(r){return r.json();}).then(function(r){
