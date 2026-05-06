@@ -78,8 +78,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 
 /* ── 타이머 팝업 */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:400;display:none;}
-.timer-popup{position:fixed;bottom:0;left:0;right:0;z-index:500;background:var(--bg2);border-top:1px solid var(--border);border-radius:20px 20px 0 0;padding:20px 20px calc(40px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}
-.timer-popup.open{transform:translateY(0);}
+.timer-popup{position:fixed;bottom:0;left:0;right:0;z-index:500;background:var(--bg2);border-top:1px solid var(--border);border-radius:20px 20px 0 0;padding:20px 20px calc(40px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);visibility:hidden;}
+.timer-popup.open{transform:translateY(0);visibility:visible;}
 .popup-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px;}
 .popup-title{font-size:.9rem;font-weight:900;color:#fff;text-align:center;margin-bottom:14px;}
 .preset-row{display:flex;gap:6px;justify-content:center;margin-bottom:16px;flex-wrap:wrap;}
@@ -203,13 +203,14 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .cal-nav h3{font-size:1rem;font-weight:900;color:#fff;}
 .cal-nav-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:6px 12px;cursor:pointer;font-size:.85rem;}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-.cal-dow{text-align:center;font-size:.62rem;color:var(--sub);padding:4px 0;font-weight:700;}
-.cal-day{min-height:52px;background:var(--bg3);border-radius:7px;padding:4px;cursor:pointer;border:1px solid transparent;transition:border-color .15s;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);grid-auto-rows:44px;gap:2px;}
+#cal-grid-wrap{display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:24px;grid-auto-rows:44px;gap:2px;}
+.cal-dow{text-align:center;font-size:.62rem;color:var(--sub);font-weight:700;display:flex;align-items:center;justify-content:center;}
+.cal-day{background:var(--bg3);border-radius:7px;padding:4px;cursor:pointer;border:1px solid transparent;transition:border-color .15s;overflow:hidden;}
 .cal-day:hover{border-color:var(--border);}
 .cal-day.today{border-color:var(--green);}
 .cal-day.selected{border-color:var(--green);background:rgba(0,255,157,.07);}
-.cal-day.empty{background:transparent;cursor:default;border:none;}
+.cal-day.empty{background:var(--bg3);cursor:default;border:1px solid transparent;opacity:0.15;}
 .cal-day .dn{font-size:.72rem;color:var(--sub);font-weight:700;margin-bottom:3px;}
 .cal-day.today .dn{color:var(--green);}
 .cal-day .cats{display:flex;flex-wrap:wrap;gap:2px;}
@@ -289,7 +290,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 <div class="appbar">
   <div class="appbar-row">
     <h1>🐻 GYM <em>TRACKER</em></h1>
-    <span id="saved">✓ 저장됨</span>
+    <div style="display:flex;align-items:center;gap:8px;"><span id="saved">✓ 저장됨</span><button onclick="manualSave()" style="padding:5px 12px;background:var(--green);color:#080808;border:none;border-radius:6px;font-size:.72rem;font-weight:900;cursor:pointer;">💾 저장</button></div>
   </div>
 </div>
 <div id="view-banner" class="view-banner" style="display:none">👀 보기 전용 모드</div>
@@ -313,9 +314,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
         <select id="w-ex" onchange="onExChange()">
           <option value="">종목 선택</option>
           <optgroup label="가슴"><option>벤치프레스</option><option>인클라인벤치프레스</option><option>디클라인벤치프레스</option><option>덤벨프레스</option><option>인클라인덤벨프레스</option><option>덤벨플라이</option><option>케이블크로스오버</option><option>팩덱플라이</option><option>딥스</option><option>딥스(어시스트)</option><option>푸쉬업</option></optgroup>
-          <optgroup label="등"><option>데드리프트</option><option>루마니안데드리프트</option><option>바벨로우</option><option>덤벨로우</option><option>랫풀다운</option><option>시티드케이블로우</option><option>풀업</option><option>풀업(어시스트)</option><option>친업</option><option>친업(어시스트)</option><option>페이스풀</option><option>시티드로우</option></optgroup>
-          <optgroup label="하체"><option>스쿼트</option><option>프론트스쿼트</option><option>레그프레스</option><option>레그익스텐션</option><option>레그컬</option><option>힙쓰러스트</option><option>런지</option><option>불가리안스플릿스쿼트</option><option>카프레이즈</option></optgroup>
-          <optgroup label="어깨"><option>숄더프레스</option><option>덤벨숄더프레스</option><option>사이드레터럴레이즈</option><option>프론트레이즈</option><option>리어델트플라이</option><option>업라이트로우</option></optgroup>
+          <optgroup label="등"><option>데드리프트</option><option>루마니안데드리프트</option><option>바벨로우</option><option>덤벨로우</option><option>랫풀다운</option><option>시티드케이블로우</option><option>풀업</option><option>풀업(어시스트)</option><option>친업</option><option>친업(어시스트)</option><option>시티드로우</option></optgroup>
+          <optgroup label="하체"><option>스쿼트</option><option>프론트스쿼트</option><option>레그프레스</option><option>레그익스텐션</option><option>레그컬</option><option>힙쓰러스트</option><option>런지</option><option>불가리안스플릿스쿼트</option><option>카프레이즈</option><option>이너타이</option><option>아웃타이</option><option>힙어덕션</option><option>힙어브덕션</option></optgroup>
+          <optgroup label="어깨"><option>숄더프레스</option><option>덤벨숄더프레스</option><option>사이드레터럴레이즈</option><option>프론트레이즈</option><option>리어델트플라이</option><option>업라이트로우</option><option>비하인드숄더프레스</option><option>스미스숄더프레스</option><option>스미스머신업라이트로우</option></optgroup>
           <optgroup label="팔"><option>바이셉컬</option><option>해머컬</option><option>인클라인덤벨컬</option><option>케이블컬</option><option>트라이셉스푸쉬다운</option><option>오버헤드익스텐션</option><option>스컬크러셔</option><option>클로즈그립벤치프레스</option></optgroup>
           <optgroup label="복근/맨몸"><option>플랭크</option><option>크런치</option><option>싯업</option><option>레그레이즈</option><option>행잉레그레이즈</option><option>케이블크런치</option><option>하이퍼익스텐션</option></optgroup>
         </select>
@@ -501,11 +502,11 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
       <h3 id="cal-title"></h3>
       <button class="cal-nav-btn" onclick="calMove(1)">›</button>
     </div>
-    <div class="cal-grid" style="margin-bottom:4px;">
+    <div class="cal-grid" id="cal-grid-wrap">
       <div class="cal-dow">일</div><div class="cal-dow">월</div><div class="cal-dow">화</div>
       <div class="cal-dow">수</div><div class="cal-dow">목</div><div class="cal-dow">금</div><div class="cal-dow">토</div>
+      <div id="cal-grid" style="display:contents;"></div>
     </div>
-    <div class="cal-grid" id="cal-grid"></div>
     <div class="cal-legend">
       <div class="leg-item"><div class="cat-dot cat-chest"></div>가슴</div>
       <div class="leg-item"><div class="cat-dot cat-back"></div>등</div>
@@ -652,16 +653,38 @@ var ASSIST_EX=['딥스(어시스트)','풀업(어시스트)','친업(어시스�
 var NUT_MODES={bulk:{name:'벌크업',color:'#ff9f1c',deficit:300,protMult:1.8},recomp:{name:'린매스',color:'#00ff9d',deficit:-175,protMult:2.0},cut:{name:'컷팅',color:'#ff4d6d',deficit:-350,protMult:2.2},maintain:{name:'유지',color:'#38bdf8',deficit:0,protMult:1.6}};
 var NUT_TIPS={bulk:['탄수화물을 운동 전후 집중 섭취하세요','단백질은 끼니마다 30~40g씩 나눠 드세요'],recomp:['단백질 먼저 채우고 탄수화물로 나머지 채우세요','운동 후 30분 내 단백질+탄수화물 섭취하세요'],cut:['단백질 높게 유지해야 근손실을 막아요','유산소는 웨이트 후에 하세요'],maintain:['영양소 균형이 중요해요','수분 2L 이상 유지하세요']};
 var nutMode='recomp',nutWorkout=true;
+var daySettings=ld('gymv3_ds',{}); // 날짜별 모드/운동여부/주간플랜 저장
 var nutDate=new Date(),today=new Date();
 var calYear=new Date().getFullYear(),calMonth=new Date().getMonth(),calSelected=null;
 
-var EX_CAT={'벤치프레스':'chest','인클라인벤치프레스':'chest','디클라인벤치프레스':'chest','덤벨프레스':'chest','인클라인덤벨프레스':'chest','덤벨플라이':'chest','케이블크로스오버':'chest','팩덱플라이':'chest','딥스':'chest','딥스(어시스트)':'chest','푸쉬업':'chest','데드리프트':'back','루마니안데드리프트':'back','바벨로우':'back','덤벨로우':'back','랫풀다운':'back','시티드케이블로우':'back','풀업':'back','풀업(어시스트)':'back','친업':'back','친업(어시스트)':'back','페이스풀':'back','시티드로우':'back','스쿼트':'legs','프론트스쿼트':'legs','레그프레스':'legs','레그익스텐션':'legs','레그컬':'legs','힙쓰러스트':'legs','런지':'legs','불가리안스플릿스쿼트':'legs','카프레이즈':'legs','숄더프레스':'shoulder','덤벨숄더프레스':'shoulder','사이드레터럴레이즈':'shoulder','프론트레이즈':'shoulder','리어델트플라이':'shoulder','업라이트로우':'shoulder','바이셉컬':'arms','해머컬':'arms','인클라인덤벨컬':'arms','케이블컬':'arms','트라이셉스푸쉬다운':'arms','오버헤드익스텐션':'arms','스컬크러셔':'arms','클로즈그립벤치프레스':'arms','플랭크':'core','크런치':'core','싯업':'core','레그레이즈':'core','행잉레그레이즈':'core','케이블크런치':'core','하이퍼익스텐션':'core'};
+var EX_CAT={'벤치프레스':'chest','인클라인벤치프레스':'chest','디클라인벤치프레스':'chest','덤벨프레스':'chest','인클라인덤벨프레스':'chest','덤벨플라이':'chest','케이블크로스오버':'chest','팩덱플라이':'chest','딥스':'chest','딥스(어시스트)':'chest','푸쉬업':'chest','데드리프트':'back','루마니안데드리프트':'back','바벨로우':'back','덤벨로우':'back','랫풀다운':'back','시티드케이블로우':'back','풀업':'back','풀업(어시스트)':'back','친업':'back','친업(어시스트)':'back','페이스풀':'shoulder','시티드로우':'back','스쿼트':'legs','프론트스쿼트':'legs','레그프레스':'legs','레그익스텐션':'legs','레그컬':'legs','힙쓰러스트':'legs','런지':'legs','불가리안스플릿스쿼트':'legs','카프레이즈':'legs','이너타이':'legs','아웃타이':'legs','힙어덕션':'legs','힙어브덕션':'legs','숄더프레스':'shoulder','덤벨숄더프레스':'shoulder','사이드레터럴레이즈':'shoulder','프론트레이즈':'shoulder','리어델트플라이':'shoulder','업라이트로우':'shoulder','비하인드숄더프레스':'shoulder','스미스숄더프레스':'shoulder','스미스머신업라이트로우':'shoulder','바이셉컬':'arms','해머컬':'arms','인클라인덤벨컬':'arms','케이블컬':'arms','트라이셉스푸쉬다운':'arms','오버헤드익스텐션':'arms','스컬크러셔':'arms','클로즈그립벤치프레스':'arms','플랭크':'core','크런치':'core','싯업':'core','레그레이즈':'core','행잉레그레이즈':'core','케이블크런치':'core','하이퍼익스텐션':'core',
+'스티프레그데드리프트':'back','언더그립바벨로우':'back','티바로우':'back','체스트서포티드로우':'back',
+'클로즈그립랫풀다운':'back','케이블풀오버':'back','백익스텐션':'back','리버스하이퍼':'back','스모데드리프트':'back','랙풀':'back','서마리안데드리프트':'back','덤벨풀오버':'back','스트레이트암풀다운':'back','싱글암케이블로우':'back','인버티드로우':'back','머신로우':'back','시티드머신로우':'back','굿모닝':'back','케이블풀스루':'back',
+'스미스벤치프레스':'chest','케이블플라이':'chest','체스트프레스머신':'chest','디클라인덤벨프레스':'chest','인클라인덤벨플라이':'chest',
+'스미스스쿼트':'legs','핵스쿼트':'legs','45도레그프레스':'legs','라잉레그컬':'legs','시티드레그컬':'legs',
+'스미스힙쓰러스트':'legs','워킹런지':'legs','리버스런지':'legs','스텝업':'legs',
+'힙어브덕션머신':'legs','시티드카프레이즈':'legs','글루트킥백':'legs',
+'아놀드프레스':'shoulder','케이블레터럴레이즈':'shoulder','케이블프론트레이즈':'shoulder',
+'리어델트머신':'shoulder','케이블리어델트플라이':'shoulder','스미스머신업라이트로우':'shoulder',
+'바벨쉬러그':'shoulder','덤벨쉬러그':'shoulder','케이블쉬러그':'shoulder','숄더프레스머신':'shoulder','머신레터럴레이즈':'shoulder','원암케이블레터럴레이즈':'shoulder','바벨프론트레이즈':'shoulder','플레이트프론트레이즈':'shoulder','벤트오버레터럴레이즈':'shoulder','인클라인리어델트플라이':'shoulder',
+'컨센트레이션컬':'arms','케이블해머컬':'arms','프리처컬':'arms','바벨컬':'arms','EZ바컬':'arms',
+'로프푸쉬다운':'arms','케이블오버헤드익스텐션':'arms','덤벨킥백':'arms',
+'사이드플랭크':'core','행잉니업':'core','AB롤아웃':'core','마운틴클라이머':'core',
+'러시안트위스트':'core','V업':'core','토터치':'core',
+};
 var CAT_CLS={chest:'cat-chest',back:'cat-back',legs:'cat-legs',shoulder:'cat-shoulder',arms:'cat-arms',core:'cat-core',cardio:'cat-cardio'};
 var CAT_KR={chest:'가슴',back:'등',legs:'하체',shoulder:'어깨',arms:'팔',core:'복근',cardio:'유산소'};
 var NUT_COLORS={prot:'#38bdf8',carb:'#ff9f1c',fat:'#a78bfa'};
 var NUT_NAMES={prot:'단백질',carb:'탄수화물',fat:'지방'};
 var WEEK_PLAN=[{d:'월',w:true},{d:'화',w:false},{d:'수',w:true},{d:'목',w:true},{d:'금',w:false},{d:'토',w:true},{d:'일',w:false}];
 
+
+function manualSave(){
+  sv(WK,workouts); sv(CK,cardios); sv(BK,bodies);
+  sv(NK,nutMeals); sv(IK,myInfo); sv(FK,savedFoods);
+  serverSave();
+  showToast('💾 저장 완료!');
+}
 function flash(){var e=document.getElementById('saved');e.classList.add('on');setTimeout(function(){e.classList.remove('on');},1500);}
 function fmt(n){return parseFloat(n).toLocaleString('ko-KR');}
 function pct(a,b){return (a-b)/b*100;}
@@ -820,13 +843,25 @@ function switchNut(t,btn){
   if(t==='saved')renderSavedList();
   if(t==='goal')renderNutGoal();
 }
-function changeNutDay(dir){nutDate=new Date(nutDate);nutDate.setDate(nutDate.getDate()+dir);document.getElementById('nut-date-label').textContent=fmtDate(nutDate);renderNutToday();}
+function changeNutDay(dir){nutDate=new Date(nutDate);nutDate.setDate(nutDate.getDate()+dir);document.getElementById('nut-date-label').textContent=fmtDate(nutDate);renderNutToday();renderNutGoal();}
 
+function getDaySetting(key, def){
+  var dk=dateKey(nutDate);
+  return daySettings[dk]&&daySettings[dk][key]!==undefined ? daySettings[dk][key] : def;
+}
+function setDaySetting(key, val){
+  var dk=dateKey(nutDate);
+  if(!daySettings[dk]) daySettings[dk]={};
+  daySettings[dk][key]=val;
+  sv('gymv3_ds',daySettings);
+}
 function calcNutGoals(){
+  var curDayMode = getDaySetting('mode', nutMode);
+  var curDayWorkout = getDaySetting('workout', nutWorkout);
   var bw=bodies.length?bodies[bodies.length-1].bw:60;
-  var m=NUT_MODES[nutMode];
+  var m=NUT_MODES[curDayMode];
   var bmr=myInfo.gender==='m'?Math.round(10*bw+6.25*myInfo.h-5*myInfo.age+5):Math.round(10*bw+6.25*myInfo.h-5*myInfo.age-161);
-  var tdee=nutWorkout?Math.round(bmr*myInfo.act):Math.round(bmr*1.375);
+  var tdee=curDayWorkout?Math.round(bmr*myInfo.act):Math.round(bmr*1.375);
   var kcal=tdee+m.deficit;
   var prot=Math.round(bw*m.protMult);
   var fat=Math.round(kcal*0.22/9);
@@ -891,19 +926,40 @@ function delMeal(i){if(IS_VIEW){showToast('👀 보기 전용 모드예요!');re
 
 function setNutMode(mode,btn){if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}
   nutMode=mode;
+  setDaySetting('mode', mode);
   document.querySelectorAll('.mode-btn').forEach(function(b){b.classList.remove('on');b.style.borderColor='';b.style.color='';});
   btn.classList.add('on');btn.style.borderColor=NUT_MODES[mode].color;btn.style.color=NUT_MODES[mode].color;
   renderNutGoal();renderNutToday();
 }
-function setNutWorkout(val,btn){if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}nutWorkout=val;document.querySelectorAll('.wt-btn').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');renderNutGoal();renderNutToday();}
+function setNutWorkout(val,btn){if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}nutWorkout=val;setDaySetting('workout',val);document.querySelectorAll('.wt-btn').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');renderNutGoal();renderNutToday();}
 
 function renderNutGoal(){
+  // 날짜별 저장된 모드/운동여부 불러와서 UI 반영
+  var curDayMode = getDaySetting('mode', nutMode);
+  var curDayWorkout = getDaySetting('workout', nutWorkout);
+  document.querySelectorAll('.mode-btn').forEach(function(b){b.classList.remove('on');b.style.borderColor='';b.style.color='';});
+  var modeMap={'bulk':0,'recomp':1,'cut':2,'maintain':3};
+  var modeButtons=document.querySelectorAll('.mode-btn');
+  if(modeButtons[modeMap[curDayMode]]){modeButtons[modeMap[curDayMode]].classList.add('on');modeButtons[modeMap[curDayMode]].style.borderColor=NUT_MODES[curDayMode].color;modeButtons[modeMap[curDayMode]].style.color=NUT_MODES[curDayMode].color;}
+  document.querySelectorAll('.wt-btn').forEach(function(b,i){b.classList.toggle('on',(i===0&&curDayWorkout)||(i===1&&!curDayWorkout));});
+
   var g=calcNutGoals(),m=NUT_MODES[nutMode];
   document.getElementById('goal-tdee-row').innerHTML=[{l:'기초대사량',v:g.bmr,c:'var(--sub)'},{l:'활동 TDEE',v:g.tdee,c:'var(--text)'},{l:'목표 칼로리',v:g.kcal,c:m.color}].map(function(t){return '<div class="td"><div class="tdl">'+t.l+'</div><div class="tdv" style="color:'+t.c+';">'+t.v.toLocaleString()+'<span style="font-size:.58rem;color:var(--sub);"> kcal</span></div></div>';}).join('');
   var macros=[{k:'prot',n:'단백질',v:g.prot,kcal:g.prot*4,c:NUT_COLORS.prot,r:g.prot*4/g.kcal},{k:'carb',n:'탄수화물',v:g.carb,kcal:g.carb*4,c:NUT_COLORS.carb,r:g.carb*4/g.kcal},{k:'fat',n:'지방',v:g.fat,kcal:g.fat*9,c:NUT_COLORS.fat,r:g.fat*9/g.kcal}];
   document.getElementById('goal-macro-result').innerHTML=macros.map(function(mac){return '<div style="margin-bottom:9px;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:.78rem;font-weight:700;color:'+mac.c+';">'+mac.n+'</span><span style="font-size:.73rem;color:'+mac.c+';"><strong>'+mac.v+'g</strong> <span style="color:var(--sub);font-size:.63rem;">('+mac.kcal+'kcal · '+Math.round(mac.r*100)+'%)</span></span></div><div style="height:8px;background:var(--bg);border-radius:4px;overflow:hidden;"><div style="height:100%;width:'+Math.round(mac.r*100)+'%;background:'+mac.c+';border-radius:4px;"></div></div></div>';}).join('');
   document.getElementById('goal-tips').innerHTML=NUT_TIPS[nutMode].map(function(t){return '<div class="tip-item">• '+t+'</div>';}).join('');
-  document.getElementById('goal-week').innerHTML=WEEK_PLAN.map(function(d){var tdee2=d.w?Math.round(g.bmr*myInfo.act):Math.round(g.bmr*1.375);var k2=tdee2+NUT_MODES[nutMode].deficit;return '<div class="wg-day"><div class="wg-d">'+d.d+'</div><div style="font-size:.85rem;">'+(d.w?'🏋️':'😴')+'</div><div class="wg-kcal" style="color:'+(d.w?'var(--green)':'var(--sub)')+';">'+k2+'</div></div>';}).join('');
+  // 주간플랜 사용자 직접 설정
+  var weekPlanKey='gymv3_wp';
+  var savedWeekPlan=ld(weekPlanKey,null)||WEEK_PLAN.map(function(d){return{d:d.d,w:d.w};});
+  document.getElementById('goal-week').innerHTML=savedWeekPlan.map(function(d,i){
+    var tdee2=d.w?Math.round(g.bmr*myInfo.act):Math.round(g.bmr*1.375);
+    var k2=tdee2+NUT_MODES[curDayMode].deficit;
+    return '<div class="wg-day" onclick="toggleWeekDay('+i+')" style="cursor:pointer;border:1px solid '+(d.w?'rgba(0,255,157,.3)':'var(--border)')+';">'
+      +'<div class="wg-d">'+d.d+'</div>'
+      +'<div style="font-size:.85rem;">'+(d.w?'🏋️':'😴')+'</div>'
+      +'<div class="wg-kcal" style="color:'+(d.w?'var(--green)':'var(--sub)')+';">'+k2+'</div>'
+      +'</div>';
+  }).join('');
 }
 
 function renderSavedSelect(){
@@ -962,7 +1018,7 @@ function renderCalendar(){
   var months=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
   document.getElementById('cal-title').textContent=calYear+'년 '+months[calMonth];
   var grid=document.getElementById('cal-grid'),html='';
-  for(var i=0;i<firstDay;i++)html+='<div class="cal-day empty"></div>';
+  for(var i=0;i<firstDay;i++)html+='<div class="cal-day empty"><div class="dn" style="opacity:0;">0</div></div>';
   for(var d=1;d<=daysInMonth;d++){
     var dateStr=calYear+'-'+(calMonth+1<10?'0'+(calMonth+1):calMonth+1)+'-'+(d<10?'0'+d:d);
     var cats=getDayCats(dateStr);
@@ -972,6 +1028,9 @@ function renderCalendar(){
     var dots=cats.map(function(c){return '<div class="cat-dot '+CAT_CLS[c]+'"></div>';}).join('');
     html+='<div class="'+cls+'" onclick="selectDay(\''+dateStr+'\')">'+'<div class="dn">'+d+'</div>'+'<div class="cats">'+dots+'</div>'+'</div>';
   }
+  var total = firstDay + daysInMonth;
+  var remaining = total % 7 === 0 ? 0 : 7 - (total % 7);
+  for(var j=0;j<remaining;j++) html+='<div class="cal-day empty"><div class="dn" style="opacity:0;">0</div></div>';
   grid.innerHTML=html;
   if(calSelected)renderDayDetail(calSelected);
 }
@@ -1086,10 +1145,16 @@ function renderBody(){
     renderRangeSummary();
   } else document.getElementById('b-range-card').style.display='none';
 
-  function dH(c,p){if(!c||!p)return '';var pc=pct(c,p),cls=pc>0?'up':'dn';return '<div class="sdiff '+(pc>0?'up-bad':'dn-good')+'">'+(pc>0?'▲':'▼')+Math.abs(pc).toFixed(1)+'%</div>';}
+  function dH(c,p,inv){
+    if(!c||!p)return '';
+    var pc=pct(c,p),pos=pc>0;
+    var good=inv?pos:!pos;
+    var col=good?'var(--green)':'var(--red)';
+    return '<div class="sdiff" style="color:'+col+';">'+(pos?'▲':'▼')+Math.abs(pc).toFixed(1)+'%</div>';
+  }
   function fC(f,bw){var r=parseFloat(fatRate(f,bw));if(!r)return '';return r<15?'fa':r<20?'fb':r<25?'fc':'fd';}
   var rows=s.map(function(l,i){var prev=i>0?s[i-1]:null,fr=fatRate(l.fat,l.bw);
-    return '<div class="brow"><div class="brow-top"><span class="bdate">'+l.date+'</span>'+(IS_VIEW?'':'<button class="bdels" onclick="delB('+l.id+')">✕</button>')+'</div><div class="s4"><div><div class="sl">체중</div><div class="sv">'+l.bw+'<sub>kg</sub></div>'+(prev?dH(l.bw,prev.bw):'')+'</div><div><div class="sl">근육량</div><div class="sv'+(l.muscle?'':' dash')+'" style="'+(l.muscle?'color:var(--blue);':'')+'">'+( l.muscle?l.muscle+'<sub>kg</sub>':'–')+'</div>'+(prev&&l.muscle&&prev.muscle?dH(l.muscle,prev.muscle):'')+'</div><div><div class="sl">체지방</div><div class="sv'+(l.fat?'':' dash')+'">'+(l.fat?l.fat+'<sub>kg</sub>':'–')+'</div></div><div><div class="sl">체지방률</div><div class="sv '+fC(l.fat,l.bw)+'">'+(fr?fr+'%':'–')+'</div></div></div></div>';
+    return '<div class="brow"><div class="brow-top"><span class="bdate">'+l.date+'</span>'+(IS_VIEW?'':'<button class="bdels" onclick="delB('+l.id+')">✕</button>')+'</div><div class="s4"><div><div class="sl">체중</div><div class="sv">'+l.bw+'<sub>kg</sub></div>'+(prev?dH(l.bw,prev.bw,false):'')+'</div><div><div class="sl">근육량</div><div class="sv'+(l.muscle?'':' dash')+'" style="'+(l.muscle?'color:var(--blue);':'')+'">'+( l.muscle?l.muscle+'<sub>kg</sub>':'–')+'</div>'+(prev&&l.muscle&&prev.muscle?dH(l.muscle,prev.muscle,true):'')+'</div><div><div class="sl">체지방</div><div class="sv'+(l.fat?'':' dash')+'">'+(l.fat?l.fat+'<sub>kg</sub>':'–')+'</div></div><div><div class="sl">체지방률</div><div class="sv '+fC(l.fat,l.bw)+'">'+(fr?fr+'%':'–')+'</div></div></div></div>';
   }).join('');
   var sum='';
   if(s.length>=2){var f=s[0],last=s[s.length-1];function chg(lbl,val,unit,inv){var n=parseFloat(val),pos=n>0,good=inv?!pos:pos;var cls=pos?(good?'pg':'pb'):(good?'ng':'nb');return '<div class="si"><span class="lb">'+lbl+' </span><span class="'+cls+'">'+(pos?'+':'')+n.toFixed(1)+unit+'</span></div>';}sum='<div class="sbar"><div class="slbl">전체 변화 · '+f.date+' → '+last.date+'</div><div class="sitems">'+chg('체중',last.bw-f.bw,'kg',true)+(f.muscle&&last.muscle?chg('근육량',last.muscle-f.muscle,'kg',false):'')+(f.fat&&last.fat?chg('체지방',last.fat-f.fat,'kg',true):'')+(f.fat&&last.fat?chg('체지방률',parseFloat(fatRate(last.fat,last.bw))-parseFloat(fatRate(f.fat,f.bw)),'%',true):'')+'</div></div>';}
@@ -1145,6 +1210,15 @@ function initViewMode(){
     renderWorkouts();renderCardio();renderBody();renderBodyInfo();renderNutToday();
     patchViewMode();
   }).catch(function(){showToast('⚠️ 데이터 불러오기 실패');});
+}
+
+function toggleWeekDay(i){
+  if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}
+  var weekPlanKey='gymv3_wp';
+  var savedWeekPlan=ld(weekPlanKey,null)||WEEK_PLAN.map(function(d){return{d:d.d,w:d.w};});
+  savedWeekPlan[i].w = !savedWeekPlan[i].w;
+  sv(weekPlanKey, savedWeekPlan);
+  renderNutGoal();
 }
 function patchViewMode(){
   if(!IS_VIEW) return;
