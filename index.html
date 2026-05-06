@@ -1034,7 +1034,7 @@ function renderCalendar(){
   grid.innerHTML=html;
   if(calSelected)renderDayDetail(calSelected);
 }
-function selectDay(dateStr){calSelected=dateStr;renderCalendar();}
+function selectDay(dateStr){calSelected=dateStr;renderCalendar();renderDayDetail(dateStr);}
 function renderDayDetail(dateStr){
   var el=document.getElementById('day-detail');
   var ws=workouts.filter(function(w){return w.date===dateStr;}),cs=cardios.filter(function(c){return c.date===dateStr;});
