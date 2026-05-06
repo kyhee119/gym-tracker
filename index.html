@@ -199,22 +199,26 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 .calc-preview{background:var(--bg3);border-radius:8px;padding:10px 12px;margin:8px 0;display:none;}
 .cp-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:5px;}
 
-/* ── 캘린더 */
+
 .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .cal-nav h3{font-size:1rem;font-weight:900;color:#fff;}
 .cal-nav-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:6px 12px;cursor:pointer;font-size:.85rem;}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);grid-auto-rows:44px;gap:2px;}
-#cal-grid-wrap{display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:24px;grid-auto-rows:44px;gap:2px;}
-.cal-dow{text-align:center;font-size:.62rem;color:var(--sub);font-weight:700;display:flex;align-items:center;justify-content:center;}
+
+
+
+
 .cal-day{background:var(--bg3);border-radius:7px;padding:4px;cursor:pointer;border:1px solid transparent;transition:border-color .15s;overflow:hidden;}
-.cal-day:hover{border-color:var(--border);}
-.cal-day.today{border-color:var(--green);}
-.cal-day.selected{border-color:var(--green);background:rgba(0,255,157,.07);}
-.cal-day.empty{background:var(--bg3);cursor:default;border:1px solid transparent;opacity:0.15;}
-.cal-day .dn{font-size:.72rem;color:var(--sub);font-weight:700;margin-bottom:3px;}
-.cal-day.today .dn{color:var(--green);}
-.cal-day .cats{display:flex;flex-wrap:wrap;gap:2px;}
-.cat-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+
+
+
+
+
+
+
+
+
+
+
 .cat-chest{background:#ff6b9d;}.cat-back{background:#4af;}.cat-legs{background:#ffd166;}
 .cat-shoulder{background:#a78bfa;}.cat-arms{background:#00ff9d;}.cat-core{background:#ff9f1c;}.cat-cardio{background:#f87171;}
 .day-detail{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:6px;}
@@ -283,6 +287,19 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 .view-banner{background:rgba(0,255,157,.08);border-bottom:1px solid rgba(0,255,157,.2);padding:8px 16px;text-align:center;font-size:.75rem;color:var(--green);font-weight:700;}
 
 .empty{text-align:center;color:var(--dim);padding:44px 0;font-size:.84rem;line-height:2.2;}
+
+/* ── 캘린더 */
+#cal-table{width:100%;border-collapse:separate;border-spacing:2px;table-layout:fixed;}
+#cal-table th{font-size:.62rem;color:var(--sub);font-weight:700;text-align:center;padding:4px 0;height:24px;}
+#cal-table td{background:var(--bg3);border-radius:7px;padding:4px;cursor:pointer;border:1px solid transparent;vertical-align:top;width:14.285%;height:48px;max-height:48px;overflow:hidden;}
+#cal-table tr{height:48px;}
+#cal-table td.empty{opacity:.15;cursor:default;}
+#cal-table td.today{border-color:var(--green);}
+#cal-table td.selected{border-color:var(--green);background:rgba(0,255,157,.07);}
+.cal-dn{font-size:.72rem;color:var(--sub);font-weight:700;margin-bottom:3px;}
+#cal-table td.today .cal-dn{color:var(--green);}
+.cal-cats{display:flex;flex-wrap:wrap;gap:2px;}
+.cat-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -502,11 +519,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
       <h3 id="cal-title"></h3>
       <button class="cal-nav-btn" onclick="calMove(1)">›</button>
     </div>
-    <div class="cal-grid" id="cal-grid-wrap">
-      <div class="cal-dow">일</div><div class="cal-dow">월</div><div class="cal-dow">화</div>
-      <div class="cal-dow">수</div><div class="cal-dow">목</div><div class="cal-dow">금</div><div class="cal-dow">토</div>
-      <div id="cal-grid" style="display:contents;"></div>
-    </div>
+    <table id="cal-table" style="width:100%;border-collapse:separate;border-spacing:2px;table-layout:fixed;"></table>
     <div class="cal-legend">
       <div class="leg-item"><div class="cat-dot cat-chest"></div>가슴</div>
       <div class="leg-item"><div class="cat-dot cat-back"></div>등</div>
@@ -666,7 +679,7 @@ var EX_CAT={'벤치프레스':'chest','인클라인벤치프레스':'chest','디
 '힙어브덕션머신':'legs','시티드카프레이즈':'legs','글루트킥백':'legs',
 '아놀드프레스':'shoulder','케이블레터럴레이즈':'shoulder','케이블프론트레이즈':'shoulder',
 '리어델트머신':'shoulder','케이블리어델트플라이':'shoulder','스미스머신업라이트로우':'shoulder',
-'바벨쉬러그':'shoulder','덤벨쉬러그':'shoulder','케이블쉬러그':'shoulder','숄더프레스머신':'shoulder','머신레터럴레이즈':'shoulder','원암케이블레터럴레이즈':'shoulder','바벨프론트레이즈':'shoulder','플레이트프론트레이즈':'shoulder','벤트오버레터럴레이즈':'shoulder','인클라인리어델트플라이':'shoulder',
+'바벨쉬러그':'shoulder','덤벨쉬러그':'shoulder','케이블쉬러그':'shoulder','숄더프레스머신':'shoulder','머신레터럴레이즈':'shoulder','원암케이블레터럴레이즈':'shoulder','바벨프론트레이즈':'shoulder','플레이트프론트레이즈':'shoulder','벤트오버레터럴레이즈':'shoulder','인클라인리어델트플라이':'shoulder','비하인드넥프레스':'shoulder','플레이트로디드숄더프레스':'shoulder','리버스플라이':'shoulder',
 '컨센트레이션컬':'arms','케이블해머컬':'arms','프리처컬':'arms','바벨컬':'arms','EZ바컬':'arms',
 '로프푸쉬다운':'arms','케이블오버헤드익스텐션':'arms','덤벨킥백':'arms',
 '사이드플랭크':'core','행잉니업':'core','AB롤아웃':'core','마운틴클라이머':'core',
@@ -1017,23 +1030,44 @@ function renderCalendar(){
   var td=new Date(),firstDay=new Date(calYear,calMonth,1).getDay(),daysInMonth=new Date(calYear,calMonth+1,0).getDate();
   var months=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
   document.getElementById('cal-title').textContent=calYear+'년 '+months[calMonth];
-  var grid=document.getElementById('cal-grid'),html='';
-  for(var i=0;i<firstDay;i++)html+='<div class="cal-day empty"><div class="dn" style="opacity:0;">0</div></div>';
+  var table=document.getElementById('cal-table');
+  var days=['일','월','화','수','목','금','토'];
+  var html='<thead><tr>';
+  days.forEach(function(d){ html+='<th class="cal-dow">'+d+'</th>'; });
+  html+='</tr></thead><tbody><tr>';
+  var col=0;
+  // 앞 빈칸
+  for(var i=0;i<firstDay;i++){
+    html+='<td class="cal-day empty"><div class="dn"></div></td>';
+    col++;
+  }
+  // 날짜
   for(var d=1;d<=daysInMonth;d++){
-    var dateStr=calYear+'-'+(calMonth+1<10?'0'+(calMonth+1):calMonth+1)+'-'+(d<10?'0'+d:d);
+    var mm=(calMonth+1<10?'0'+(calMonth+1):''+(calMonth+1));
+    var dd=(d<10?'0'+d:''+d);
+    var dateStr=calYear+'-'+mm+'-'+dd;
     var cats=getDayCats(dateStr);
     var isToday=(td.getFullYear()===calYear&&td.getMonth()===calMonth&&td.getDate()===d);
     var isSel=calSelected===dateStr;
-    var cls='cal-day'+(isToday?' today':'')+(isSel?' selected':'');
+    var cls=(isToday?'today':'')+(isSel?' selected':'');
     var dots=cats.map(function(c){return '<div class="cat-dot '+CAT_CLS[c]+'"></div>';}).join('');
-    html+='<div class="'+cls+'" onclick="selectDay(\''+dateStr+'\')">'+'<div class="dn">'+d+'</div>'+'<div class="cats">'+dots+'</div>'+'</div>';
+    html+='<td class="'+cls+'" data-date="'+dateStr+'"><div class="cal-dn">'+d+'</div><div class="cal-cats">'+dots+'</div></td>';
+    col++;
+    if(col%7===0&&d<daysInMonth) html+='</tr><tr>';
   }
-  var total = firstDay + daysInMonth;
-  var remaining = total % 7 === 0 ? 0 : 7 - (total % 7);
-  for(var j=0;j<remaining;j++) html+='<div class="cal-day empty"><div class="dn" style="opacity:0;">0</div></div>';
-  grid.innerHTML=html;
-  if(calSelected)renderDayDetail(calSelected);
+  // 뒷 빈칸
+  var remaining=(col%7===0)?0:7-(col%7);
+  for(var j=0;j<remaining;j++) html+='<td class="cal-day empty"></td>';
+  html+='</tr></tbody>';
+  table.innerHTML=html;
+  table.onclick=function(e){
+    var el=e.target.closest('[data-date]');
+    if(el) selectDay(el.getAttribute('data-date'));
+  };
+  if(calSelected) renderDayDetail(calSelected);
+
 }
+
 function selectDay(dateStr){calSelected=dateStr;renderCalendar();renderDayDetail(dateStr);}
 function renderDayDetail(dateStr){
   var el=document.getElementById('day-detail');
