@@ -300,6 +300,21 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 #cal-table td.today .cal-dn{color:var(--green);}
 .cal-cats{display:flex;flex-wrap:wrap;gap:2px;}
 .cat-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+
+/* ── 종목 검색 */
+.search-wrap,.ex-search-wrap{position:relative;}
+.ex-search-input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:10px 36px 10px 12px;font-size:.88rem;outline:none;transition:border-color .2s;}
+.ex-search-input:focus{border-color:var(--green);}
+.ex-search-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--sub);cursor:pointer;font-size:1rem;}
+.ex-search-selected{margin-top:5px;padding:7px 11px;background:rgba(0,255,157,.08);border:1px solid rgba(0,255,157,.2);border-radius:7px;font-size:.83rem;color:var(--green);font-weight:700;}
+.ex-search-dropdown{position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:10px;max-height:220px;overflow-y:auto;z-index:300;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5);}
+.ex-search-dropdown.open{display:block;}
+.ex-cat-label{padding:5px 12px 3px;font-size:.58rem;color:var(--sub);text-transform:uppercase;letter-spacing:.08em;font-weight:700;background:var(--bg3);position:sticky;top:0;}
+.ex-item{padding:10px 14px;font-size:.85rem;cursor:pointer;border-bottom:1px solid var(--border);color:var(--text);}
+.ex-item:last-child{border-bottom:none;}
+.ex-item:active,.ex-item.sel{background:rgba(0,255,157,.08);color:var(--green);}
+.ex-item mark{background:none;color:var(--green);font-weight:700;}
+.ex-no-result{padding:20px;text-align:center;color:var(--sub);font-size:.82rem;}
 </style>
 </head>
 <body>
@@ -328,15 +343,12 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
     <div class="g2">
       <div class="fl full"><label>날짜</label><input type="date" id="w-date"/></div>
       <div class="fl full"><label>종목</label>
-        <select id="w-ex" onchange="onExChange()">
-          <option value="">종목 선택</option>
-          <optgroup label="가슴"><option>벤치프레스</option><option>인클라인벤치프레스</option><option>디클라인벤치프레스</option><option>덤벨프레스</option><option>인클라인덤벨프레스</option><option>덤벨플라이</option><option>케이블크로스오버</option><option>팩덱플라이</option><option>딥스</option><option>딥스(어시스트)</option><option>푸쉬업</option></optgroup>
-          <optgroup label="등"><option>데드리프트</option><option>루마니안데드리프트</option><option>바벨로우</option><option>덤벨로우</option><option>랫풀다운</option><option>시티드케이블로우</option><option>풀업</option><option>풀업(어시스트)</option><option>친업</option><option>친업(어시스트)</option><option>시티드로우</option><option>원암덤벨로우</option><option>원암플레이트로우</option><option>백익스텐션</option><option>스모데드리프트</option><option>랙풀</option><option>서마리안데드리프트</option><option>덤벨풀오버</option><option>케이블풀오버</option><option>스트레이트암풀다운</option><option>싱글암케이블로우</option><option>인버티드로우</option><option>머신로우</option><option>시티드머신로우</option><option>플레이트로디드포웨이로우</option><option>굿모닝</option><option>케이블풀스루</option></optgroup>
-          <optgroup label="하체"><option>데드리프트</option><option>루마니안데드리프트</option><option>스티프레그데드리프트</option><option>덤벨데드리프트</option><option>싱글레그데드리프트</option><option>스쿼트</option><option>프론트스쿼트</option><option>레그프레스</option><option>레그익스텐션</option><option>레그컬</option><option>힙쓰러스트</option><option>런지</option><option>불가리안스플릿스쿼트</option><option>카프레이즈</option><option>이너타이</option><option>아웃타이</option><option>힙어덕션</option><option>힙어브덕션</option></optgroup>
-          <optgroup label="어깨"><option>숄더프레스</option><option>덤벨숄더프레스</option><option>사이드레터럴레이즈</option><option>프론트레이즈</option><option>덤벨리어델트플라이</option><option>업라이트로우</option><option>비하인드넥프레스</option><option>머신리버스플라이</option><option>플레이트숄더프레스</option><option>플레이트로디드숄더프레스</option><option>스미스숄더프레스</option><option>스미스머신업라이트로우</option><option>페이스풀</option><option>바벨쉬러그</option><option>덤벨쉬러그</option><option>케이블레터럴레이즈</option><option>머신레터럴레이즈</option><option>아놀드프레스</option><option>케이블프론트레이즈</option><option>인클라인리어델트플라이</option></optgroup>
-          <optgroup label="팔"><option>바벨컬</option><option>덤벨컬</option><option>원암오버헤드익스텐션</option><option>해머컬</option><option>인클라인덤벨컬</option><option>케이블컬</option><option>트라이셉스푸쉬다운</option><option>오버헤드익스텐션</option><option>스컬크러셔</option><option>클로즈그립벤치프레스</option></optgroup>
-          <optgroup label="복근/맨몸"><option>플랭크</option><option>크런치</option><option>싯업</option><option>레그레이즈</option><option>행잉레그레이즈</option><option>케이블크런치</option><option>하이퍼익스텐션</option></optgroup>
-        </select>
+        <div class="search-wrap" id="ex-search-wrap">
+        <input class="ex-search-input" id="ex-search-input" placeholder="🔍 종목 검색 (예: 벤치, 스쿼트, 컬...)" autocomplete="off" oninput="onExSearch()" onfocus="onExFocus()" onblur="onExBlur()"/>
+        <button class="ex-search-clear" id="ex-search-clear" onclick="clearExSearch()" style="display:none;">✕</button>
+        <div class="ex-search-dropdown" id="ex-search-dropdown"></div>
+      </div>
+      <div class="ex-search-selected" id="ex-search-selected" style="display:none;"></div>
       </div>
     </div>
     <div id="ex-notice" style="display:none;"></div>
@@ -698,6 +710,90 @@ function manualSave(){
   serverSave();
   showToast('💾 저장 완료!');
 }
+
+
+// ── 종목 검색
+var EX_LIST = {
+  '가슴': ['벤치프레스','인클라인벤치프레스','디클라인벤치프레스','덤벨프레스','인클라인덤벨프레스','디클라인덤벨프레스','덤벨플라이','인클라인덤벨플라이','케이블크로스오버','케이블플라이','팩덱플라이','체스트프레스머신','스미스벤치프레스','딥스','딥스(어시스트)','푸쉬업'],
+  '등': ['바벨로우','언더그립바벨로우','티바로우','덤벨로우','원암덤벨로우','원암플레이트로우','체스트서포티드로우','랫풀다운','클로즈그립랫풀다운','시티드케이블로우','케이블풀오버','스트레이트암풀다운','싱글암케이블로우','풀업','풀업(어시스트)','친업','친업(어시스트)','인버티드로우','머신로우','시티드머신로우','플레이트로디드포웨이로우','백익스텐션','하이퍼익스텐션','리버스하이퍼','랙풀','굿모닝','케이블풀스루'],
+  '하체': ['데드리프트','루마니안데드리프트','스티프레그데드리프트','덤벨데드리프트','싱글레그데드리프트','스모데드리프트','서마리안데드리프트','스쿼트','프론트스쿼트','스미스스쿼트','핵스쿼트','레그프레스','45도레그프레스','레그익스텐션','레그컬','라잉레그컬','시티드레그컬','힙쓰러스트','스미스힙쓰러스트','런지','워킹런지','리버스런지','불가리안스플릿스쿼트','스텝업','이너타이','아웃타이','힙어덕션','힙어브덕션','힙어브덕션머신','카프레이즈','시티드카프레이즈','글루트킥백'],
+  '어깨': ['숄더프레스','덤벨숄더프레스','아놀드프레스','비하인드넥프레스','스미스숄더프레스','플레이트숄더프레스','플레이트로디드숄더프레스','사이드레터럴레이즈','케이블레터럴레이즈','머신레터럴레이즈','프론트레이즈','케이블프론트레이즈','바벨프론트레이즈','플레이트프론트레이즈','덤벨리어델트플라이','머신리버스플라이','케이블리어델트플라이','인클라인리어델트플라이','벤트오버레터럴레이즈','페이스풀','업라이트로우','스미스머신업라이트로우','바벨쉬러그','덤벨쉬러그','숄더프레스머신'],
+  '팔': ['바벨컬','덤벨컬','해머컬','인클라인덤벨컬','컨센트레이션컬','케이블컬','케이블해머컬','프리처컬','EZ바컬','원암오버헤드익스텐션','트라이셉스푸쉬다운','로프푸쉬다운','오버헤드익스텐션','케이블오버헤드익스텐션','스컬크러셔','클로즈그립벤치프레스','덤벨킥백'],
+  '복근/맨몸': ['플랭크','사이드플랭크','크런치','싯업','레그레이즈','행잉레그레이즈','행잉니업','케이블크런치','AB롤아웃','마운틴클라이머','러시안트위스트','V업','토터치']
+};
+var EX_EMOJIS = {'가슴':'🫁','등':'🔙','하체':'🦵','어깨':'💪','팔':'💪','복근/맨몸':'🏋️'};
+var exBlurTimer = null;
+var selectedExName = '';
+
+function onExSearch(){
+  var q = document.getElementById('ex-search-input').value.trim();
+  document.getElementById('ex-search-clear').style.display = q ? 'block' : 'none';
+  renderExDropdown(q);
+}
+function onExFocus(){
+  renderExDropdown(document.getElementById('ex-search-input').value.trim());
+}
+function onExBlur(){
+  exBlurTimer = setTimeout(closeExDropdown, 200);
+}
+function renderExDropdown(q){
+  var dd = document.getElementById('ex-search-dropdown');
+  var rows = [];
+  Object.keys(EX_LIST).forEach(function(cat){
+    var items = EX_LIST[cat].filter(function(ex){ return !q || ex.indexOf(q) !== -1; });
+    if(!items.length) return;
+    rows.push('<div class="ex-cat-label">'+(EX_EMOJIS[cat]||'')+' '+cat+'</div>');
+    items.forEach(function(ex){
+      var hi = q ? ex.split(q).join('<mark>'+q+'</mark>') : ex;
+      rows.push('<div class="ex-item" data-exname="'+ex+'">'+hi+'</div>');
+    });
+  });
+  if(!rows.length) rows.push('<div class="ex-no-result">검색 결과가 없어요 😅</div>');
+  dd.innerHTML = rows.join('');
+  dd.classList.add('open');
+  // 클릭 이벤트 위임
+  dd.onclick = function(e){
+    var item = e.target.closest('[data-exname]');
+    if(!item) return;
+    if(exBlurTimer){ clearTimeout(exBlurTimer); exBlurTimer=null; }
+    pickEx(item.getAttribute('data-exname'));
+  };
+}
+function closeExDropdown(){
+  document.getElementById('ex-search-dropdown').classList.remove('open');
+}
+function pickEx(ex){
+  selectedExName = ex;
+  document.getElementById('ex-search-input').value = ex;
+  document.getElementById('ex-search-input').setAttribute('data-ex', ex);
+  document.getElementById('ex-search-clear').style.display = 'block';
+  var sel = document.getElementById('ex-search-selected');
+  sel.style.display = 'block';
+  sel.textContent = '✅ ' + ex + ' 선택됨';
+  closeExDropdown();
+  onExChangeByName(ex);
+}
+function clearExSearch(){
+  selectedExName = '';
+  document.getElementById('ex-search-input').value = '';
+  document.getElementById('ex-search-input').removeAttribute('data-ex');
+  document.getElementById('ex-search-clear').style.display = 'none';
+  document.getElementById('ex-search-selected').style.display = 'none';
+  document.getElementById('ex-notice').style.display = 'none';
+  closeExDropdown();
+  setRows=[]; renderSets(); addSetRow(); addSetRow();
+  document.getElementById('ex-search-input').focus();
+}
+function onExChangeByName(ex){
+  var type = exType(ex);
+  var n = document.getElementById('ex-notice');
+  if(type==='assist'){ n.style.display=''; n.innerHTML='<div class="notice notice-orange">⚠️ 어시스트 머신 — 무게가 <strong>낮을수록</strong> 더 어렵습니다.</div>'; }
+  else if(type==='bw'){ n.style.display=''; n.innerHTML='<div class="notice notice-green">💪 맨몸 운동 — 횟수만 입력하세요.</div>'; }
+  else n.style.display = 'none';
+  setRows=[]; renderSets(); addSetRow(); addSetRow();
+}
+
+
 function flash(){var e=document.getElementById('saved');e.classList.add('on');setTimeout(function(){e.classList.remove('on');},1500);}
 function fmt(n){return parseFloat(n).toLocaleString('ko-KR');}
 function pct(a,b){return (a-b)/b*100;}
@@ -718,17 +814,11 @@ function switchTab(t){
 // ══ 웨이트
 var setRows=[];
 function exType(ex){if(ASSIST_EX.indexOf(ex)!==-1)return 'assist';if(BW_EX.indexOf(ex)!==-1)return 'bw';return 'normal';}
-function onExChange(){
-  var ex=document.getElementById('w-ex').value,type=exType(ex),n=document.getElementById('ex-notice');
-  if(type==='assist'){n.style.display='';n.innerHTML='<div class="notice notice-orange">⚠️ 어시스트 머신 — 무게가 <strong>낮을수록</strong> 더 어렵습니다.</div>';}
-  else if(type==='bw'){n.style.display='';n.innerHTML='<div class="notice notice-green">💪 맨몸 운동 — 횟수만 입력하세요.</div>';}
-  else n.style.display='none';
-  setRows=[];renderSets();addSetRow();addSetRow();
-}
+
 function addSetRow(){setRows.push({id:Date.now()+setRows.length,kg:'',reps:''});renderSets();}
 function removeRow(id){setRows=setRows.filter(function(r){return r.id!==id;});renderSets();}
 function renderSets(){
-  var ex=document.getElementById('w-ex').value,type=exType(ex),area=document.getElementById('set-area');
+  var ex=document.getElementById('ex-search-input').getAttribute('data-ex')||'',type=exType(ex),area=document.getElementById('set-area');
   if(!setRows.length){area.innerHTML='';updateTot();return;}
   area.innerHTML=setRows.map(function(r,i){
     if(type==='bw'){return '<div class="set-row" id="sr'+r.id+'"><span class="snum">S'+(i+1)+'</span><input class="sinp" type="number" placeholder="횟수" value="'+r.reps+'" style="max-width:9999px" oninput="upd('+r.id+',\'reps\',this.value)"/><span class="svol'+(r.reps?' lit':'')+'">'+( r.reps?r.reps+'회':'—')+'</span><button class="bdel" onclick="removeRow('+r.id+')">✕</button></div>';}
@@ -739,7 +829,7 @@ function renderSets(){
 }
 function upd(id,f,v){
   var r=setRows.find(function(x){return x.id===id;});if(r)r[f]=v;
-  var ex=document.getElementById('w-ex').value,type=exType(ex);
+  var ex=document.getElementById('ex-search-input').getAttribute('data-ex')||'',type=exType(ex);
   setRows.forEach(function(r){
     var el=document.querySelector('#sr'+r.id+' .svol');if(!el)return;
     if(type==='bw'){el.textContent=r.reps?r.reps+'회':'—';el.className='svol'+(r.reps?' lit':'');}
@@ -747,13 +837,13 @@ function upd(id,f,v){
   });updateTot();
 }
 function updateTot(){
-  var ex=document.getElementById('w-ex').value,type=exType(ex),el=document.getElementById('totbox');
+  var ex=document.getElementById('ex-search-input').getAttribute('data-ex')||'',type=exType(ex),el=document.getElementById('totbox');
   if(type==='bw'){var t=setRows.reduce(function(s,r){return s+(r.reps?parseInt(r.reps):0);},0);el.innerHTML=t?'총 <span>'+t+'회</span>':'—';}
   else{var t=setRows.reduce(function(s,r){return s+(r.kg&&r.reps?parseFloat(r.kg)*parseInt(r.reps):0);},0);el.innerHTML=t?'총 <span>'+fmt(t)+'kg</span>':'—';}
 }
 function saveWorkout(){
   if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}
-  var date=document.getElementById('w-date').value,ex=document.getElementById('w-ex').value,err=document.getElementById('w-err'),type=exType(ex);
+  var date=document.getElementById('w-date').value,ex=document.getElementById('ex-search-input').getAttribute('data-ex')||'',err=document.getElementById('w-err'),type=exType(ex);
   if(!date||!ex){err.textContent='날짜와 종목을 선택해주세요.';return;}
   if(!setRows.length){err.textContent='세트를 추가해주세요.';return;}
   var valid=type==='bw'?setRows.filter(function(r){return r.reps&&parseInt(r.reps)>0;}):setRows.filter(function(r){return r.kg&&r.reps&&parseFloat(r.kg)>0&&parseInt(r.reps)>0;});
@@ -764,7 +854,7 @@ function saveWorkout(){
   else{sets=valid.map(function(r){return{kg:parseFloat(r.kg),reps:parseInt(r.reps)};});totalVol=valid.reduce(function(s,r){return s+parseFloat(r.kg)*parseInt(r.reps);},0);}
   workouts.push({id:Date.now(),date:date,ex:ex,sets:sets,totalVol:totalVol,type:type});
   sv(WK,workouts);setRows=[];renderSets();addSetRow();addSetRow();
-  document.getElementById('w-ex').value='';document.getElementById('ex-notice').style.display='none';
+  clearExSearch();
   if(!IS_VIEW)serverSave();flash();renderWorkouts();
 }
 function delW(id){if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}if(!confirm('삭제할까요?'))return;workouts=workouts.filter(function(w){return w.id!==id;});sv(WK,workouts);if(!IS_VIEW)serverSave();renderWorkouts();}
