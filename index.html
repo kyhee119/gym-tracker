@@ -794,6 +794,19 @@ function onExChangeByName(ex){
 }
 
 
+
+// 해당 날짜에 가장 가까운 체성분 데이터 반환
+function getBodyAtDate(dateStr){
+  if(!bodies.length) return null;
+  var sorted = bodies.slice().sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+  var target = new Date(dateStr);
+  var best = sorted[0];
+  for(var i=0;i<sorted.length;i++){
+    if(new Date(sorted[i].date) <= target) best = sorted[i];
+    else break;
+  }
+  return best;
+}
 function flash(){var e=document.getElementById('saved');e.classList.add('on');setTimeout(function(){e.classList.remove('on');},1500);}
 function fmt(n){return parseFloat(n).toLocaleString('ko-KR');}
 function pct(a,b){return (a-b)/b*100;}
@@ -961,11 +974,12 @@ function setDaySetting(key, val){
 function calcNutGoals(){
   var curDayMode = getDaySetting('mode', nutMode);
   var curDayWorkout = getDaySetting('workout', nutWorkout);
-  var bw=bodies.length?bodies[bodies.length-1].bw:60;
+  var bodyAtDate = getBodyAtDate(dateKey(nutDate));
+  var bw = bodyAtDate ? bodyAtDate.bw : 60;
+  var fat = bodyAtDate && bodyAtDate.fat ? bodyAtDate.fat : bw*0.18;
+  var leanMass = bw - fat;
+  var bmr = Math.round(370 + 21.6*leanMass);
   var m=NUT_MODES[curDayMode];
-  var latestFat=bodies.length&&bodies[bodies.length-1].fat?bodies[bodies.length-1].fat:bw*0.18;
-  var leanMass=bw-latestFat;
-  var bmr=Math.round(370+21.6*leanMass);
   var tdee=curDayWorkout?Math.round(bmr*myInfo.act):Math.round(bmr*1.375);
   var kcal=tdee+m.deficit;
   var prot=Math.round(bw*m.protMult);
