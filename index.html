@@ -963,7 +963,9 @@ function calcNutGoals(){
   var curDayWorkout = getDaySetting('workout', nutWorkout);
   var bw=bodies.length?bodies[bodies.length-1].bw:60;
   var m=NUT_MODES[curDayMode];
-  var bmr=myInfo.gender==='m'?Math.round(10*bw+6.25*myInfo.h-5*myInfo.age+5):Math.round(10*bw+6.25*myInfo.h-5*myInfo.age-161);
+  var latestFat=bodies.length&&bodies[bodies.length-1].fat?bodies[bodies.length-1].fat:bw*0.18;
+  var leanMass=bw-latestFat;
+  var bmr=Math.round(370+21.6*leanMass);
   var tdee=curDayWorkout?Math.round(bmr*myInfo.act):Math.round(bmr*1.375);
   var kcal=tdee+m.deficit;
   var prot=Math.round(bw*m.protMult);
@@ -1199,7 +1201,9 @@ function toggleInfoEdit(){
 function liveCalc(){
   var h=parseFloat(document.getElementById('inp-h').value)||170,age=parseInt(document.getElementById('inp-age').value)||30,gender=document.getElementById('inp-gender').value,act=parseFloat(document.getElementById('inp-act').value)||1.55;
   var bw=bodies.length?bodies[bodies.length-1].bw:60;
-  var bmr=gender==='m'?Math.round(10*bw+6.25*h-5*age+5):Math.round(10*bw+6.25*h-5*age-161);
+  var latestFat2=bodies.length&&bodies[bodies.length-1].fat?bodies[bodies.length-1].fat:bw*0.18;
+  var leanMass2=bw-latestFat2;
+  var bmr=Math.round(370+21.6*leanMass2);
   var tdeeW=Math.round(bmr*act),prot=Math.round(bw*2.0);
   document.getElementById('live-bmr').textContent=bmr.toLocaleString();
   document.getElementById('live-tdee').textContent=tdeeW.toLocaleString();
@@ -1211,7 +1215,9 @@ function saveInfo(){if(IS_VIEW){showToast('👀 보기 전용 모드예요!');re
 }
 function renderBodyInfo(){
   var bw=bodies.length?bodies[bodies.length-1].bw:60;
-  var bmr=myInfo.gender==='m'?Math.round(10*bw+6.25*myInfo.h-5*myInfo.age+5):Math.round(10*bw+6.25*myInfo.h-5*myInfo.age-161);
+  var latestFat=bodies.length&&bodies[bodies.length-1].fat?bodies[bodies.length-1].fat:bw*0.18;
+  var leanMass=bw-latestFat;
+  var bmr=Math.round(370+21.6*leanMass);
   var tdeeW=Math.round(bmr*myInfo.act),tdeeR=Math.round(bmr*1.375);
   var prot=Math.round(bw*2.0);
   var actLabels={'1.2':'거의 안함','1.375':'주 1~2회','1.55':'주 3~5회','1.725':'주 6~7회'};
