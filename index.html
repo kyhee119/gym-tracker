@@ -798,11 +798,21 @@ function onExChangeByName(ex){
 // 해당 날짜에 가장 가까운 체성분 데이터 반환
 function getBodyAtDate(dateStr){
   if(!bodies.length) return null;
-  var sorted = bodies.slice().sort(function(a,b){return new Date(a.date)-new Date(b.date);});
-  var target = new Date(dateStr);
+  // dateStr을 YYYY-MM-DD 형식으로 정규화
+  var targetParts = dateStr.split('-');
+  var targetTs = new Date(
+    parseInt(targetParts[0]),
+    parseInt(targetParts[1])-1,
+    parseInt(targetParts[2])
+  ).getTime();
+  var sorted = bodies.slice().sort(function(a,b){
+    return new Date(a.date).getTime()-new Date(b.date).getTime();
+  });
   var best = sorted[0];
   for(var i=0;i<sorted.length;i++){
-    if(new Date(sorted[i].date) <= target) best = sorted[i];
+    var dp = sorted[i].date.split('-');
+    var ts = new Date(parseInt(dp[0]),parseInt(dp[1])-1,parseInt(dp[2])).getTime();
+    if(ts <= targetTs) best = sorted[i];
     else break;
   }
   return best;
