@@ -315,6 +315,15 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 .ex-item:active,.ex-item.sel{background:rgba(0,255,157,.08);color:var(--green);}
 .ex-item mark{background:none;color:var(--green);font-weight:700;}
 .ex-no-result{padding:20px;text-align:center;color:var(--sub);font-size:.82rem;}
+
+/* ── 메모 */
+.memo-wrap{margin-top:8px;margin-bottom:8px;}
+.memo-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;}
+.memo-tag{padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--sub);font-size:.73rem;cursor:pointer;transition:all .15s;}
+.memo-tag.on{background:rgba(56,189,248,.1);border-color:var(--blue);color:var(--blue);}
+.memo-input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:8px 11px;font-size:.84rem;outline:none;transition:border-color .2s;}
+.memo-input:focus{border-color:var(--blue);}
+.rec-memo{display:inline-block;margin-left:5px;padding:2px 7px;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);border-radius:20px;font-size:.63rem;color:var(--blue);font-weight:700;}
 </style>
 </head>
 <body>
@@ -349,6 +358,11 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
         <div class="ex-search-dropdown" id="ex-search-dropdown"></div>
       </div>
       <div class="ex-search-selected" id="ex-search-selected" style="display:none;"></div>
+      <div class="memo-wrap" id="memo-wrap" style="display:none;">
+        <label style="color:var(--sub);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:4px;">메모 (그립/변형)</label>
+        <div class="memo-tags" id="memo-tags"></div>
+        <input class="memo-input" id="memo-input" type="text" placeholder="직접 입력 (예: 와이드MAG, 인클라인 30도...)"/>
+      </div>
       </div>
     </div>
     <div id="ex-notice" style="display:none;"></div>
@@ -817,6 +831,41 @@ function getBodyAtDate(dateStr){
   }
   return best;
 }
+
+// ── 메모 태그
+var MEMO_TAGS = {
+  'back': ['와이드그립','클로즈그립','언더그립','뉴트럴그립','로프','MAG','와이드MAG'],
+  'shoulder': ['와이드그립','클로즈그립','덤벨','케이블','바벨'],
+  'arms': ['스탠딩','인클라인','시티드','케이블','해머'],
+};
+
+function renderMemoTags(cat){
+  var wrap = document.getElementById('memo-wrap');
+  var tagsDiv = document.getElementById('memo-tags');
+  var tags = MEMO_TAGS[cat] || [];
+  if(!tags.length){
+    tagsDiv.innerHTML = '';
+  } else {
+    tagsDiv.innerHTML = tags.map(function(t){
+      return '<div class="memo-tag" onclick="toggleMemoTag(this,\''+t+'\')">'+t+'</div>';
+    }).join('');
+  }
+  wrap.style.display = '';
+  document.getElementById('memo-input').value = '';
+}
+
+function toggleMemoTag(el, val){
+  var input = document.getElementById('memo-input');
+  if(el.classList.contains('on')){
+    el.classList.remove('on');
+    input.value = '';
+  } else {
+    document.querySelectorAll('.memo-tag').forEach(function(t){t.classList.remove('on');});
+    el.classList.add('on');
+    input.value = val;
+  }
+}
+
 function flash(){var e=document.getElementById('saved');e.classList.add('on');setTimeout(function(){e.classList.remove('on');},1500);}
 function fmt(n){return parseFloat(n).toLocaleString('ko-KR');}
 function pct(a,b){return (a-b)/b*100;}
@@ -866,7 +915,7 @@ function updateTot(){
 }
 function saveWorkout(){
   if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}
-  var date=document.getElementById('w-date').value,ex=document.getElementById('ex-search-input').getAttribute('data-ex')||'',err=document.getElementById('w-err'),type=exType(ex);
+  var date=document.getElementById('w-date').value,ex=document.getElementById('ex-search-input').getAttribute('data-ex')||'',memo=document.getElementById('memo-input').value.trim(),err=document.getElementById('w-err'),type=exType(ex);
   if(!date||!ex){err.textContent='날짜와 종목을 선택해주세요.';return;}
   if(!setRows.length){err.textContent='세트를 추가해주세요.';return;}
   var valid=type==='bw'?setRows.filter(function(r){return r.reps&&parseInt(r.reps)>0;}):setRows.filter(function(r){return r.kg&&r.reps&&parseFloat(r.kg)>0&&parseInt(r.reps)>0;});
@@ -875,7 +924,7 @@ function saveWorkout(){
   var sets,totalVol;
   if(type==='bw'){sets=valid.map(function(r){return{kg:0,reps:parseInt(r.reps)};});totalVol=valid.reduce(function(s,r){return s+parseInt(r.reps);},0);}
   else{sets=valid.map(function(r){return{kg:parseFloat(r.kg),reps:parseInt(r.reps)};});totalVol=valid.reduce(function(s,r){return s+parseFloat(r.kg)*parseInt(r.reps);},0);}
-  workouts.push({id:Date.now(),date:date,ex:ex,sets:sets,totalVol:totalVol,type:type});
+  workouts.push({id:Date.now(),date:date,ex:ex,memo:memo,sets:sets,totalVol:totalVol,type:type});
   sv(WK,workouts);setRows=[];renderSets();addSetRow();addSetRow();
   clearExSearch();
   if(!IS_VIEW)serverSave();flash();renderWorkouts();
