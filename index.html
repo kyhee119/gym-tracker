@@ -1052,6 +1052,43 @@ function saveDailyNote(){
   renderCalendar();
 }
 
+
+// 화면 복귀시 타이머 재보정
+document.addEventListener('visibilitychange', function(){
+  if(!document.hidden && tRunning && tStartAt){
+    var elapsed=Math.floor((Date.now()-tStartAt)/1000);
+    tLeft=tPausedLeft-elapsed;
+    if(tLeft<=0){
+      tLeft=0;updDisp();
+      clearInterval(tIv);tRunning=false;timerDone();
+    } else {
+      updDisp();
+    }
+  }
+});
+
+
+// Wake Lock - 타이머 중 화면 꺼짐 방지
+async function requestWakeLock(){
+  if('wakeLock' in navigator){
+    try{
+      wakeLock = await navigator.wakeLock.request('screen');
+    }catch(e){}
+  }
+}
+function releaseWakeLock(){
+  if(wakeLock){
+    wakeLock.release();
+    wakeLock=null;
+  }
+}
+// 화면 복귀시 Wake Lock 재요청
+document.addEventListener('visibilitychange',function(){
+  if(!document.hidden && tRunning && wakeLock===null){
+    requestWakeLock();
+  }
+});
+
 function flash(){var e=document.getElementById('saved');e.classList.add('on');setTimeout(function(){e.classList.remove('on');},1500);}
 function fmt(n){return parseFloat(n).toLocaleString('ko-KR');}
 function pct(a,b){return (a-b)/b*100;}
@@ -1593,7 +1630,7 @@ function renderBody(){
 }
 
 // ══ 타이머
-var tTotal=60,tLeft=60,tRunning=false,tIv=null,CIRC=490;
+var tTotal=60,tLeft=60,tRunning=false,tIv=null,CIRC=490,tStartAt=null,tPausedLeft=60,wakeLock=null;
 function openTimer(){document.getElementById('timer-popup').classList.add('open');document.getElementById('overlay').style.display='block';}
 function closeTimer(){document.getElementById('timer-popup').classList.remove('open');document.getElementById('overlay').style.display='none';}
 function setPreset(s,btn){
@@ -1607,22 +1644,51 @@ function setPreset(s,btn){
     return;
   }
   timerReset();
-  tTotal=s;tLeft=s;
+  tTotal=s;tLeft=s;tPausedLeft=s;tStartAt=null;
   document.querySelectorAll('.pr-btn').forEach(function(b){b.classList.remove('on');});
   if(btn) btn.classList.add('on');
   updDisp();
 }
 function timerToggle(){
   if(tLeft<=0){timerReset();return;}
-  // 타이머 시작시 알림 권한 요청
+  // 알림 권한 요청
   if('Notification' in window && Notification.permission==='default'){
     Notification.requestPermission();
   }
-  if(tRunning){clearInterval(tIv);tRunning=false;document.getElementById('t-btn').textContent='계속';document.getElementById('t-status').textContent='일시정지';}
-  else{tRunning=true;document.getElementById('t-btn').textContent='일시정지';document.getElementById('t-status').textContent='쉬는 중...';document.getElementById('t-done').style.display='none';tIv=setInterval(function(){tLeft--;updDisp();if(tLeft<=0){clearInterval(tIv);tRunning=false;timerDone();}},1000);}
+  if(tRunning){
+    // 일시정지
+    clearInterval(tIv);
+    tRunning=false;
+    tPausedLeft=tLeft;
+    tStartAt=null;
+    releaseWakeLock();
+    document.getElementById('t-btn').textContent='계속';
+    document.getElementById('t-status').textContent='일시정지';
+  } else {
+    // 시작 or 재개 - 시작시각 기록
+    tRunning=true;
+    tStartAt=Date.now();
+    requestWakeLock();
+    document.getElementById('t-btn').textContent='일시정지';
+    document.getElementById('t-status').textContent='쉬는 중...';
+    document.getElementById('t-done').style.display='none';
+    clearInterval(tIv);
+    tIv=setInterval(function(){
+      // 실제 경과시간 기준으로 계산 (백그라운드/잠금 대응)
+      var elapsed=Math.floor((Date.now()-tStartAt)/1000);
+      tLeft=tPausedLeft-elapsed;
+      if(tLeft<=0){
+        tLeft=0;updDisp();
+        clearInterval(tIv);tRunning=false;timerDone();
+      } else {
+        updDisp();
+      }
+    },500);
+  }
 }
-function timerReset(){clearInterval(tIv);tRunning=false;tLeft=tTotal;document.getElementById('t-btn').textContent='시작';document.getElementById('t-status').textContent='준비';document.getElementById('t-done').style.display='none';document.getElementById('t-ring').style.stroke='var(--green)';updDisp();}
+function timerReset(){clearInterval(tIv);tRunning=false;tLeft=tTotal;tPausedLeft=tTotal;tStartAt=null;releaseWakeLock();document.getElementById('t-btn').textContent='시작';document.getElementById('t-status').textContent='준비';document.getElementById('t-done').style.display='none';document.getElementById('t-ring').style.stroke='var(--green)';updDisp();}
 function timerDone(){
+  releaseWakeLock();
   document.getElementById('t-btn').textContent='다시';
   document.getElementById('t-status').textContent='완료!';
   document.getElementById('t-done').style.display='';
