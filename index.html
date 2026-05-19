@@ -1733,9 +1733,10 @@ function serverLoad(cb){
 function initViewMode(){
   var params=new URLSearchParams(window.location.search),binId=params.get('share');
   if(!binId){
-    document.getElementById('share-btn').style.display='';
+    if(!IS_VIEW) document.getElementById('share-btn').style.display='';
     // 로컬 데이터 먼저 즉시 렌더링
     renderWorkouts();renderCardio();renderBody();renderBodyInfo();renderNutToday();
+    renderCalendar();renderNutGoal();patchViewMode();
     // 백그라운드로 서버 동기화
     serverLoad(function(data){
       var changed=false;
@@ -1745,7 +1746,8 @@ function initViewMode(){
       if(data.nutMeals&&JSON.stringify(data.nutMeals)!==JSON.stringify(nutMeals)){nutMeals=data.nutMeals;sv(NK,nutMeals);changed=true;}
       if(data.myInfo&&JSON.stringify(data.myInfo)!==JSON.stringify(myInfo)){myInfo=data.myInfo;sv(IK,myInfo);changed=true;}
       if(data.savedFoods&&JSON.stringify(data.savedFoods)!==JSON.stringify(savedFoods)){savedFoods=data.savedFoods;sv(FK,savedFoods);changed=true;}
-      if(changed){renderWorkouts();renderCardio();renderBody();renderBodyInfo();renderNutToday();showToast('☁️ 최신 데이터로 업데이트됐어요!');}
+      if(changed){renderWorkouts();renderCardio();renderBody();renderBodyInfo();renderNutToday();renderCalendar();renderNutGoal();showToast('☁️ 최신 데이터로 업데이트됐어요!');}
+      patchViewMode();
     });
     return;
   }
