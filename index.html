@@ -415,18 +415,27 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
       <div class="fl full"><label>종류</label>
         <select id="c-type" onchange="onCardioChange()">
           <option value="">선택</option>
-          <option value="treadmill">🏃 런닝머신</option>
+          <option value="treadmill">🏃 런닝머신 (일반)</option>
+          <option value="incline">🏔️ 런닝머신 (인클라인)</option>
           <option value="stepmill">🪜 스텝밀 (천국의계단)</option>
           <option value="cycle">🚴 사이클</option>
         </select>
       </div>
     </div>
     <div id="c-treadmill" style="display:none;margin-top:8px;">
-      <div class="g3">
-        <div class="fl"><label>인클라인 (°)</label><input type="number" id="c-incline" placeholder="0" step="0.5" oninput="cardioPreview()"/></div>
-        <div class="fl"><label>속도 (km/h)</label><input type="number" id="c-speed" placeholder="8.0" step="0.1" oninput="cardioPreview()"/></div>
+      <div class="g2">
+        <div class="fl"><label>속도 (km/h)</label><input type="number" id="c-speed" placeholder="8.0" step="0.5" oninput="cardioPreview()"/></div>
         <div class="fl"><label>시간 (분)</label><input type="number" id="c-time" placeholder="30" oninput="cardioPreview()"/></div>
       </div>
+      <div class="c-preview" id="c-preview-treadmill"></div>
+    </div>
+    <div id="c-incline-wrap" style="display:none;margin-top:8px;">
+      <div class="g3">
+        <div class="fl"><label>인클라인 (°)</label><input type="number" id="c-incline" placeholder="5" step="0.5" oninput="cardioPreview()"/></div>
+        <div class="fl"><label>속도 (km/h)</label><input type="number" id="c-ispeed" placeholder="5.0" step="0.5" oninput="cardioPreview()"/></div>
+        <div class="fl"><label>시간 (분)</label><input type="number" id="c-itime" placeholder="30" oninput="cardioPreview()"/></div>
+      </div>
+      <div class="c-preview" id="c-preview-incline"></div>
     </div>
     <div id="c-stepmill" style="display:none;margin-top:8px;">
       <div class="g2">
@@ -726,7 +735,7 @@ var savedFoods=ld(FK,[
   {name:'브로콜리',cat:'야채',kcal:34,prot:2.8,carb:7,fat:0.4},
 ]);
 
-var IS_VIEW=false;
+var IS_VIEW=window.location.search.includes('view=1')||window.location.href.includes('view=1');
 var BW_EX=['플랭크','크런치','싯업','레그레이즈','행잉레그레이즈','케이블크런치','하이퍼익스텐션','풀업','친업','딥스','푸쉬업','런지'];
 var ASSIST_EX=['딥스(어시스트)','풀업(어시스트)','친업(어시스트)'];
 var NUT_MODES={bulk:{name:'벌크업',color:'#ff9f1c',deficit:300,protMult:1.8},recomp:{name:'린매스',color:'#00ff9d',deficit:-175,protMult:2.0},cut:{name:'컷팅',color:'#ff4d6d',deficit:-350,protMult:2.2},maintain:{name:'유지',color:'#38bdf8',deficit:0,protMult:1.6}};
@@ -1161,9 +1170,12 @@ function saveCardio(){
   err.textContent='';
   var data={id:Date.now(),date:date,type:type};
   if(type==='treadmill'){
-    data.incline=parseFloat(document.getElementById('c-incline').value)||0;
     data.speed=parseFloat(document.getElementById('c-speed').value)||0;
     data.time=parseFloat(document.getElementById('c-time').value)||0;
+  } else if(type==='incline'){
+    data.incline=parseFloat(document.getElementById('c-incline').value)||0;
+    data.speed=parseFloat(document.getElementById('c-ispeed').value)||0;
+    data.time=parseFloat(document.getElementById('c-itime').value)||0;
   } else if(type==='stepmill'){
     data.level=parseFloat(document.getElementById('c-level').value)||0;
     data.time=parseFloat(document.getElementById('c-stime').value)||0;
@@ -1756,6 +1768,27 @@ function toggleWeekDay(i){
 }
 function patchViewMode(){
   if(!IS_VIEW) return;
+  // 저장 + 기록공유 버튼 숨기기
+  document.querySelectorAll('button').forEach(function(b){
+    var t=b.textContent.trim();
+    if(t.includes('💾 저장')||t.includes('기록 공유')) b.style.display='none';
+  });
+  // 웨이트/유산소 탭 숨기기
+  document.querySelectorAll('.tab').forEach(function(b){
+    var t=b.textContent.trim();
+    if(t.includes('웨이트')||t.includes('유산소')) b.style.display='none';
+  });
+  // 캘린더 탭으로 시작
+  document.querySelectorAll('.tab').forEach(function(b){b.classList.remove('on');});
+  document.querySelectorAll('.tab').forEach(function(b){
+    if(b.textContent.includes('캘린더')) b.classList.add('on');
+  });
+  ['tab-w','tab-c','tab-n','tab-k','tab-b'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) el.style.display='none';
+  });
+  var tk=document.getElementById('tab-k');
+  if(tk) tk.style.display='';
   // 상단 저장 버튼 숨기기
   document.querySelectorAll('button').forEach(function(b){
     if(b.textContent.trim()==='💾 저장') b.style.display='none';
@@ -1799,7 +1832,7 @@ function shareData(){
 document.getElementById('nut-date-label').textContent=fmtDate(nutDate);
 addSetRow();addSetRow();
 initViewMode();
-renderWorkouts();renderCardio();renderCalendar();
+renderWorkouts();renderCardio();renderCalendar();patchViewMode();
 
 </script>
 </body>
