@@ -1740,14 +1740,15 @@ function initViewMode(){
     // 백그라운드로 서버 동기화
     serverLoad(function(data){
       var changed=false;
-      if(data.workouts&&JSON.stringify(data.workouts)!==JSON.stringify(workouts)){workouts=data.workouts;sv(WK,workouts);changed=true;}
-      if(data.cardios&&JSON.stringify(data.cardios)!==JSON.stringify(cardios)){cardios=data.cardios;sv(CK,cardios);changed=true;}
-      if(data.bodies&&JSON.stringify(data.bodies)!==JSON.stringify(bodies)){bodies=data.bodies;sv(BK,bodies);changed=true;}
-      if(data.nutMeals&&JSON.stringify(data.nutMeals)!==JSON.stringify(nutMeals)){nutMeals=data.nutMeals;sv(NK,nutMeals);changed=true;}
+      // 로컬이 비어있거나 서버 데이터가 더 많으면 무조건 서버로 덮어쓰기
+      if(data.workouts&&(workouts.length===0||data.workouts.length>workouts.length||JSON.stringify(data.workouts)!==JSON.stringify(workouts))){workouts=data.workouts;sv(WK,workouts);changed=true;}
+      if(data.cardios&&(cardios.length===0||data.cardios.length>cardios.length||JSON.stringify(data.cardios)!==JSON.stringify(cardios))){cardios=data.cardios;sv(CK,cardios);changed=true;}
+      if(data.bodies&&(bodies.length===0||data.bodies.length>bodies.length||JSON.stringify(data.bodies)!==JSON.stringify(bodies))){bodies=data.bodies;sv(BK,bodies);changed=true;}
+      if(data.nutMeals&&(Object.keys(nutMeals).length===0||JSON.stringify(data.nutMeals)!==JSON.stringify(nutMeals))){nutMeals=data.nutMeals;sv(NK,nutMeals);changed=true;}
       if(data.myInfo&&JSON.stringify(data.myInfo)!==JSON.stringify(myInfo)){myInfo=data.myInfo;sv(IK,myInfo);changed=true;}
-      if(data.savedFoods&&JSON.stringify(data.savedFoods)!==JSON.stringify(savedFoods)){savedFoods=data.savedFoods;sv(FK,savedFoods);changed=true;}
-      if(changed){renderWorkouts();renderCardio();renderBody();renderBodyInfo();renderNutToday();renderCalendar();renderNutGoal();showToast('☁️ 최신 데이터로 업데이트됐어요!');}
-      patchViewMode();
+      if(data.savedFoods&&(savedFoods.length===0||data.savedFoods.length>savedFoods.length||JSON.stringify(data.savedFoods)!==JSON.stringify(savedFoods))){savedFoods=data.savedFoods;sv(FK,savedFoods);changed=true;}
+      renderWorkouts();renderCardio();renderBody();renderBodyInfo();renderNutToday();renderCalendar();renderNutGoal();patchViewMode();
+      if(changed) showToast('☁️ 서버에서 데이터를 불러왔어요!');
     });
     return;
   }
