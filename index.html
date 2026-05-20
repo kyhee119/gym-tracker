@@ -340,6 +340,12 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 .memo-tag.on{background:rgba(56,189,248,.1);border-color:var(--blue);color:var(--blue);}
 .memo-input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:8px 11px;font-size:.84rem;outline:none;transition:border-color .2s;}
 .memo-input:focus{border-color:var(--blue);}
+
+/* ── 부위별 탭 */
+.cat-tabs{display:flex;gap:5px;overflow-x:auto;padding-bottom:4px;margin-bottom:8px;scrollbar-width:none;}
+.cat-tabs::-webkit-scrollbar{display:none;}
+.cat-tab{flex-shrink:0;padding:6px 13px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--sub);font-size:.75rem;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.cat-tab.on{background:rgba(0,255,157,.1);border-color:var(--green);color:var(--green);font-weight:700;}
 </style>
 </head>
 <body>
@@ -1381,6 +1387,13 @@ function renderRangeSummary(){
   el.innerHTML='<div style="color:#444;font-size:.62rem;letter-spacing:.05em;text-transform:uppercase;margin-bottom:7px;">'+fromDate+' → '+toDate+'</div>'
     +'<div class="sitems">'+chg('체중',t.bw-f.bw,'kg',true)+(f.muscle&&t.muscle?chg('근육량',t.muscle-f.muscle,'kg',false):'')+(f.fat&&t.fat?chg('체지방',t.fat-f.fat,'kg',true):'')+(f.fat&&t.fat?chg('체지방률',frT-frF,'%',true):'')+'</div>';
 }
+
+function chg(lbl,val,unit,inv){
+  var n=parseFloat(val),pos=n>0,good=inv?!pos:pos;
+  var cls=pos?(good?'pg':'pb'):(good?'ng':'nb');
+  return '<div class="si"><span class="lb">'+lbl+' </span><span class="'+cls+'">'+(pos?'+':'')+n.toFixed(1)+unit+'</span></div>';
+}
+
 function renderBody(){
   var el=document.getElementById('b-list');
   if(!bodies.length){el.innerHTML='<div class="empty">📊<br>체성분 기록이 없어요</div>';document.getElementById('b-range-card').style.display='none';return;}
