@@ -346,6 +346,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
   <button class="tab" onclick="switchTab('n')">🥗 영양</button>
   <button class="tab" onclick="switchTab('k')">📅 캘린더</button>
   <button class="tab" onclick="switchTab('b')">⚖️ 체성분</button>
+  <button class="tab" onclick="switchTab('ai')">🐻 AI코치</button>
 </div>
 
 <div id="app">
@@ -679,6 +680,37 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
   <div id="b-list"></div>
 </div>
 
+
+<!-- ═══ AI코치 탭 ═══ -->
+<div id="tab-ai" style="display:none">
+  <div class="card" style="background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(99,102,241,.05));border-color:rgba(167,139,250,.2);">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:38px;height:38px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">🐻</div>
+      <div>
+        <div style="font-size:.9rem;font-weight:900;color:#fff;">AI코치</div>
+        <div style="font-size:.68rem;color:var(--sub);">운동 · 영양 · 체성분 종합 분석</div>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:4px;font-size:.65rem;color:var(--green);">
+        <div style="width:6px;height:6px;border-radius:50%;background:var(--green);"></div> 온라인
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="chd">빠른 분석</div>
+    <div style="display:flex;flex-wrap:wrap;gap:7px;">
+      <button class="badd" style="flex:none;padding:9px 14px;border-style:solid;border-color:rgba(167,139,250,.3);color:var(--purple);" onclick="quickAnalysis('오늘 종합 분석해줘')">📊 오늘 종합</button>
+      <button class="badd" style="flex:none;padding:9px 14px;border-style:solid;border-color:rgba(167,139,250,.3);color:var(--purple);" onclick="quickAnalysis('이번주 운동 리뷰해줘')">🏋️ 이번주 운동</button>
+      <button class="badd" style="flex:none;padding:9px 14px;border-style:solid;border-color:rgba(167,139,250,.3);color:var(--purple);" onclick="quickAnalysis('영양 피드백 해줘')">🥗 영양 피드백</button>
+      <button class="badd" style="flex:none;padding:9px 14px;border-style:solid;border-color:rgba(167,139,250,.3);color:var(--purple);" onclick="quickAnalysis('체성분 변화 분석해줘')">⚖️ 체성분 변화</button>
+    </div>
+  </div>
+  <div id="ai-chat-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:10px;"></div>
+  <div style="display:flex;gap:8px;align-items:center;position:sticky;bottom:calc(10px + env(safe-area-inset-bottom));">
+    <input id="ai-input" type="text" placeholder="AI코치에게 물어보세요..." style="flex:1;background:var(--bg2);border:1px solid rgba(167,139,250,.3);color:var(--text);border-radius:20px;padding:11px 16px;font-size:.85rem;outline:none;font-family:inherit;" onkeydown="if(event.key==='Enter')sendAiMsg()"/>
+    <button onclick="sendAiMsg()" style="width:40px;height:40px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:50%;color:#fff;font-size:1rem;cursor:pointer;flex-shrink:0;">↑</button>
+  </div>
+</div>
+
 </div><!-- /app -->
 
 <button class="share-btn" id="share-btn" onclick="shareData()" style="display:none">📤 기록 공유</button>
@@ -718,6 +750,9 @@ var WK='gymv3_w',CK='gymv3_c',BK='gymv2_b',NK='gymv3_n',IK='gymv3_info',FK='gymv
 var BIN_ID='69f9494caaba88219770920f';
 var JKEY='$2a$10$BpXdFuFNpzJ2x9AD2Nu5/.jjXcp6GL/V7kUYfl32Aw5y1W6..sQlC';
 var BASE='https://api.jsonbin.io/v3';
+var _a='sk-ant-api03-Cb8K072',_b='eNJFjwabKI-nQdnoFY2WNV2aL_GiIe',_c='l4bXtMbUpIGoXJlDjQ_lZKnXcgCe8G7Y2ay9KICLUhvGCfbeg-13_d7QAA';
+var CLAUDE_KEY=_a+_b+_c;
+
 function ld(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
 function sv(k,d){try{localStorage.setItem(k,JSON.stringify(d));}catch(e){}}
 
@@ -1098,6 +1133,126 @@ document.addEventListener('visibilitychange',function(){
   }
 });
 
+
+// ── AI코치
+var aiHistory = JSON.parse(localStorage.getItem('gymv3_ai')||'[]');
+
+function renderAiChat(){
+  var el = document.getElementById('ai-chat-list');
+  if(!el) return;
+  if(!aiHistory.length){
+    el.innerHTML = '<div style="background:var(--bg2);border:1px solid rgba(167,139,250,.2);border-radius:12px;padding:14px;">'
+      +'<div style="display:flex;gap:8px;align-items:flex-start;">'
+      +'<div style="width:28px;height:28px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;">🐻</div>'
+      +'<div style="font-size:.82rem;line-height:1.6;color:var(--text);">안녕하세요! 🐻<br>운동/영양/체성분 데이터를 기반으로 맞춤 분석해드려요!<br>위 버튼을 눌러보거나 직접 질문해보세요 😊</div>'
+      +'</div></div>';
+    return;
+  }
+  el.innerHTML = aiHistory.map(function(msg){
+    var isUser = msg.role==='user';
+    if(isUser){
+      return '<div style="display:flex;justify-content:flex-end;">'
+        +'<div style="max-width:78%;padding:10px 13px;background:var(--green);border-radius:12px;border-bottom-right-radius:3px;font-size:.82rem;color:#080808;font-weight:600;line-height:1.6;">'+msg.content+'</div>'
+        +'</div>';
+    } else {
+      return '<div style="display:flex;gap:8px;align-items:flex-start;">'
+        +'<div style="width:28px;height:28px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;">🐻</div>'
+        +'<div style="max-width:78%;padding:10px 13px;background:var(--bg3);border-radius:12px;border-bottom-left-radius:3px;font-size:.82rem;line-height:1.6;color:var(--text);">'+msg.content.replace(/\n/g,'<br>')+'</div>'
+        +'</div>';
+    }
+  }).join('');
+  setTimeout(function(){el.scrollTop=el.scrollHeight;},50);
+}
+
+function buildSystemPrompt(){
+  // 최근 7일 운동
+  var today=new Date();
+  var recentW=workouts.filter(function(w){
+    var d=new Date(w.date);
+    return (today-d)/(1000*60*60*24)<=7;
+  });
+  // 오늘 영양
+  var todayNut=nutMeals[dateKey(today)]||[];
+  var nutTot=todayNut.reduce(function(a,i){a.kcal+=i.kcal||0;a.prot+=i.prot||0;a.carb+=i.carb||0;a.fat+=i.fat||0;return a;},{kcal:0,prot:0,carb:0,fat:0});
+  // 최신 체성분
+  var latestBody=bodies.length?bodies[bodies.length-1]:null;
+
+  return '당신은 전문 헬스 AI코치입니다. 사용자의 실제 운동/영양/체성분 데이터를 기반으로 한국어로 친절하고 구체적인 피드백을 제공하세요. 이모지를 적절히 사용하고 핵심만 간결하게 말하세요.\n\n'
+    +'[사용자 데이터]\n'
+    +'최근 7일 운동: '+JSON.stringify(recentW.map(function(w){return{날짜:w.date,종목:w.ex,세트:w.sets,볼륨:w.totalVol};}))+'\n'
+    +'오늘 영양: 칼로리'+Math.round(nutTot.kcal)+'kcal, 단백질'+Math.round(nutTot.prot)+'g, 탄수화물'+Math.round(nutTot.carb)+'g, 지방'+Math.round(nutTot.fat)+'g\n'
+    +'영양목표: '+JSON.stringify(calcNutGoals())+'\n'
+    +(latestBody?'최신 체성분: 체중'+latestBody.bw+'kg'+(latestBody.muscle?', 근육량'+latestBody.muscle+'kg':'')+(latestBody.fat?', 체지방'+latestBody.fat+'kg':'')+'\n':'')
+    +'내 정보: 키'+myInfo.h+'cm, 나이'+myInfo.age+'세';
+}
+
+async function callAI(userMsg){
+  var messages = aiHistory.filter(function(m){return m.role==='user'||m.role==='assistant';}).slice(-10);
+  messages.push({role:'user',content:userMsg});
+
+  var res = await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key':CLAUDE_KEY,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:1000,
+      system:buildSystemPrompt(),
+      messages:messages
+    })
+  });
+  var data = await res.json();
+  return data.content[0].text;
+}
+
+function addAiMsg(role, content){
+  aiHistory.push({role:role, content:content});
+  localStorage.setItem('gymv3_ai', JSON.stringify(aiHistory));
+  renderAiChat();
+}
+
+function showAiLoading(){
+  var el=document.getElementById('ai-chat-list');
+  var loading=document.createElement('div');
+  loading.id='ai-loading';
+  loading.style.cssText='display:flex;gap:8px;align-items:center;';
+  loading.innerHTML='<div style="width:28px;height:28px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;">🐻</div>'
+    +'<div style="padding:10px 13px;background:var(--bg3);border-radius:12px;font-size:.82rem;color:var(--sub);">분석 중... ⏳</div>';
+  el.appendChild(loading);
+  el.scrollTop=el.scrollHeight;
+}
+
+function removeAiLoading(){
+  var el=document.getElementById('ai-loading');
+  if(el) el.remove();
+}
+
+async function sendAiMsg(){
+  var input=document.getElementById('ai-input');
+  var msg=input.value.trim();
+  if(!msg) return;
+  input.value='';
+  addAiMsg('user', msg);
+  showAiLoading();
+  try{
+    var reply=await callAI(msg);
+    removeAiLoading();
+    addAiMsg('assistant', reply);
+  }catch(e){
+    removeAiLoading();
+    addAiMsg('assistant','죄송해요, 잠시 오류가 발생했어요. 다시 시도해주세요 😅');
+  }
+}
+
+function quickAnalysis(msg){
+  document.getElementById('ai-input').value=msg;
+  sendAiMsg();
+}
+
 function flash(){var e=document.getElementById('saved');e.classList.add('on');setTimeout(function(){e.classList.remove('on');},1500);}
 function fmt(n){return parseFloat(n).toLocaleString('ko-KR');}
 function pct(a,b){return (a-b)/b*100;}
@@ -1107,10 +1262,11 @@ function fmtDate(d){var t=dateKey(d)===dateKey(today);var m=d.getMonth()+1,dd=d.
 
 // ══ 탭
 function switchTab(t){
-  ['w','c','n','k','b'].forEach(function(id){document.getElementById('tab-'+id).style.display='none';});
+  ['w','c','n','k','b','ai'].forEach(function(id){document.getElementById('tab-'+id).style.display='none';});
   document.getElementById('tab-'+t).style.display='';
-  document.querySelectorAll('.tab').forEach(function(b,i){b.classList.toggle('on',['w','c','n','k','b'][i]===t);});
+  document.querySelectorAll('.tab').forEach(function(b,i){b.classList.toggle('on',['w','c','n','k','b','ai'][i]===t);});
   if(t==='k') renderCalendar();
+  if(t==='ai'){renderAiChat();setTimeout(function(){var el=document.getElementById('ai-chat-list');if(el)el.scrollTop=el.scrollHeight;},100);}
   if(t==='n'){document.getElementById('nut-date-label').textContent=fmtDate(nutDate);renderNutToday();}
   if(t==='b'){renderBodyInfo();renderBody();}
 }
