@@ -329,54 +329,25 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 .cat-tabs::-webkit-scrollbar{display:none;}
 .cat-tab{flex-shrink:0;padding:6px 13px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--sub);font-size:.75rem;cursor:pointer;transition:all .15s;white-space:nowrap;}
 .cat-tab.on{background:rgba(0,255,157,.1);border-color:var(--green);color:var(--green);font-weight:700;}
-
-/* ── 햄버거 메뉴 */
-.overlay-menu{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s;}
-.overlay-menu.open{opacity:1;pointer-events:all;}
-.side-menu{position:fixed;top:0;left:0;bottom:0;width:72%;max-width:280px;background:var(--bg2);z-index:300;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);border-right:1px solid var(--border);display:flex;flex-direction:column;}
-.side-menu.open{transform:translateX(0);}
-.side-header{padding:calc(50px + env(safe-area-inset-top)) 20px 16px;border-bottom:1px solid var(--border);}
-.side-app-name{font-size:1.1rem;font-weight:900;color:#fff;margin-bottom:2px;}
-.side-app-name em{color:var(--green);font-style:normal;}
-.side-sub{font-size:.72rem;color:var(--sub);}
-.side-nav{flex:1;padding:8px 0;overflow-y:auto;}
-.nav-item{display:flex;align-items:center;gap:12px;padding:13px 20px;cursor:pointer;font-size:.88rem;font-weight:600;color:var(--sub);border-left:3px solid transparent;transition:all .15s;}
-.nav-item.on{color:var(--green);border-left-color:var(--green);background:rgba(0,255,157,.05);}
-.nav-item.nav-ai{color:var(--purple);}
-.nav-item.nav-ai.on{color:var(--purple);border-left-color:var(--purple);background:rgba(167,139,250,.05);}
-.nav-icon{font-size:1.1rem;width:24px;text-align:center;}
-.side-footer{padding:16px 20px;border-top:1px solid var(--border);}
-.menu-btn{background:none;border:none;color:var(--text);font-size:1.3rem;cursor:pointer;padding:4px 8px;line-height:1;}
 </style>
 </head>
 <body>
 
-<div class="overlay-menu" id="overlay-menu" onclick="closeMenu()"></div>
-<div class="side-menu" id="side-menu">
-  <div class="side-header">
-    <div class="side-app-name">🐻 GYM <em>TRACKER</em></div>
-    <div class="side-sub">김경님의 헬스 기록</div>
-  </div>
-  <nav class="side-nav" id="side-nav">
-    <div class="nav-item on" data-tab="w" onclick="switchTabMenu('w',this)"><span class="nav-icon">🏋️</span> 웨이트</div>
-    <div class="nav-item" data-tab="c" onclick="switchTabMenu('c',this)"><span class="nav-icon">🏃</span> 유산소</div>
-    <div class="nav-item" data-tab="n" onclick="switchTabMenu('n',this)"><span class="nav-icon">🥗</span> 영양</div>
-    <div class="nav-item" data-tab="k" onclick="switchTabMenu('k',this)"><span class="nav-icon">📅</span> 캘린더</div>
-    <div class="nav-item" data-tab="b" onclick="switchTabMenu('b',this)"><span class="nav-icon">⚖️</span> 체성분</div>
-    <div class="nav-item nav-ai" data-tab="ai" onclick="switchTabMenu('ai',this)"><span class="nav-icon">🐻</span> AI코치</div>
-  </nav>
-  <div class="side-footer">
-    <div class="side-version" style="font-size:.65rem;color:var(--sub);">GYM TRACKER v3.0</div>
-  </div>
-</div>
 <div class="appbar">
-  <div class="appbar-row" style="display:flex;align-items:center;gap:10px;">
-    <button class="menu-btn" onclick="openMenu()">☰</button><h1>🐻 GYM <em>TRACKER</em></h1>
+  <div class="appbar-row">
+    <h1>🐻 GYM <em>TRACKER</em></h1>
     <div style="display:flex;align-items:center;gap:8px;"><span id="saved">✓ 저장됨</span><button onclick="manualSave()" style="padding:5px 12px;background:var(--green);color:#080808;border:none;border-radius:6px;font-size:.72rem;font-weight:900;cursor:pointer;">💾 저장</button></div>
   </div>
 </div>
 <div id="view-banner" class="view-banner" style="display:none">👀 보기 전용 모드</div>
-
+<div class="tabs" style="padding:0 13px;">
+  <button class="tab on" onclick="switchTab('w')">🏋️ 웨이트</button>
+  <button class="tab" onclick="switchTab('c')">🏃 유산소</button>
+  <button class="tab" onclick="switchTab('n')">🥗 영양</button>
+  <button class="tab" onclick="switchTab('k')">📅 캘린더</button>
+  <button class="tab" onclick="switchTab('b')">⚖️ 체성분</button>
+  <button class="tab" onclick="switchTab('ai')">🐻 AI코치</button>
+</div>
 
 <div id="app">
 
@@ -1282,23 +1253,6 @@ function quickAnalysis(msg){
   sendAiMsg();
 }
 
-
-// ── 햄버거 메뉴
-function openMenu(){
-  document.getElementById('side-menu').classList.add('open');
-  document.getElementById('overlay-menu').classList.add('open');
-}
-function closeMenu(){
-  document.getElementById('side-menu').classList.remove('open');
-  document.getElementById('overlay-menu').classList.remove('open');
-}
-function switchTabMenu(t, el){
-  switchTab(t);
-  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('on');});
-  if(el) el.classList.add('on');
-  closeMenu();
-}
-
 function flash(){var e=document.getElementById('saved');e.classList.add('on');setTimeout(function(){e.classList.remove('on');},1500);}
 function fmt(n){return parseFloat(n).toLocaleString('ko-KR');}
 function pct(a,b){return (a-b)/b*100;}
@@ -1310,7 +1264,7 @@ function fmtDate(d){var t=dateKey(d)===dateKey(today);var m=d.getMonth()+1,dd=d.
 function switchTab(t){
   ['w','c','n','k','b','ai'].forEach(function(id){document.getElementById('tab-'+id).style.display='none';});
   document.getElementById('tab-'+t).style.display='';
-  
+  document.querySelectorAll('.tab').forEach(function(b,i){b.classList.toggle('on',['w','c','n','k','b','ai'][i]===t);});
   if(t==='k') renderCalendar();
   if(t==='ai'){renderAiChat();setTimeout(function(){var el=document.getElementById('ai-chat-list');if(el)el.scrollTop=el.scrollHeight;},100);}
   if(t==='n'){document.getElementById('nut-date-label').textContent=fmtDate(nutDate);renderNutToday();}
@@ -1362,38 +1316,6 @@ function saveWorkout(){
   sv(WK,workouts);setRows=[];renderSets();addSetRow();addSetRow();
   clearExSearch();
   if(!IS_VIEW)serverSave();flash();renderWorkouts();
-}
-
-
-function onCardioChange(){
-  var t=document.getElementById('c-type').value;
-  ['c-treadmill','c-incline-wrap','c-stepmill','c-cycle'].forEach(function(id){
-    var el=document.getElementById(id);
-    if(el) el.style.display='none';
-  });
-  if(t==='treadmill') document.getElementById('c-treadmill').style.display='';
-  if(t==='incline') document.getElementById('c-incline-wrap').style.display='';
-  if(t==='stepmill') document.getElementById('c-stepmill').style.display='';
-  if(t==='cycle') document.getElementById('c-cycle').style.display='';
-}
-function cardioPreview(){
-  var t=document.getElementById('c-type').value;
-  var el=document.getElementById('c-preview');
-  if(!el) return;
-  if(t==='treadmill'){
-    var speed=parseFloat(document.getElementById('c-speed').value)||0;
-    var time=parseFloat(document.getElementById('c-time').value)||0;
-    var dist=Math.round(speed*time/60*10)/10;
-    if(speed&&time){el.style.display='';el.textContent='예상 거리: '+dist+'km';}
-    else el.style.display='none';
-  } else if(t==='incline'){
-    var inc=parseFloat(document.getElementById('c-incline').value)||0;
-    var spd=parseFloat(document.getElementById('c-ispeed').value)||0;
-    var tim=parseFloat(document.getElementById('c-itime').value)||0;
-    var dst=Math.round(spd*tim/60*10)/10;
-    if(spd&&tim){el.style.display='';el.textContent='경사 '+inc+'° · 예상 거리: '+dst+'km';}
-    else el.style.display='none';
-  } else el.style.display='none';
 }
 
 function saveCardio(){
@@ -1482,65 +1404,595 @@ function renderWorkouts(){
 function renderCardio(){
   var el=document.getElementById('c-list');
   if(!cardios.length){el.innerHTML='<div class="empty">🏃<br>유산소 기록이 없어요</div>';return;}
-
-  // 타입별 그룹
-  var groups={treadmill:[],incline:[],stepmill:[],cycle:[]};
-  cardios.forEach(function(c){if(groups[c.type])groups[c.type].push(c);});
-
-  var cardioNames={
-    treadmill:'🏃 런닝머신 (일반)',
-    incline:'🏔️ 런닝머신 (인클라인)',
-    stepmill:'🪜 스텝밀',
-    cycle:'🚴 사이클'
-  };
-
+  var groups={treadmill:[],stepmill:[],cycle:[]};cardios.forEach(function(c){if(groups[c.type])groups[c.type].push(c);});
   var html='';
-  ['treadmill','incline','stepmill','cycle'].forEach(function(t){
-    if(!groups[t].length) return;
+  var cardioNames={treadmill:'🏃 런닝머신',stepmill:'🪜 스텝밀',cycle:'🚴 사이클'};
+  ['treadmill','stepmill','cycle'].forEach(function(t){
+    if(!groups[t].length)return;
     var logs=groups[t].slice().sort(function(a,b){return new Date(a.date)-new Date(b.date);});
-    var last=logs[logs.length-1], prev=logs.length>1?logs[logs.length-2]:null;
-
-    // 과부하 판정
+    var last=logs[logs.length-1],prev=logs.length>1?logs[logs.length-2]:null;
     var tH='<span style="color:#333;font-size:.66rem">2회 이상 필요</span>';
     if(prev){
       var ls,ps;
-      if(t==='treadmill'){ls=last.speed*last.time;ps=prev.speed*prev.time;}
-      else if(t==='incline'){ls=last.incline*(last.speed||0)*(last.time||0);ps=prev.incline*(prev.speed||0)*(prev.time||0);}
-      else if(t==='stepmill'){ls=(last.level||0)*(last.time||0);ps=(prev.level||0)*(prev.time||0);}
-      else{ls=(last.level||0)*(last.time||0);ps=(prev.level||0)*(prev.time||0);}
-      if(ps>0){
-        var p=pct(ls,ps),ok=p>0;
-        tH='<div class="ol-wrap"><span class="pill '+(ok?'pill-g':'pill-r')+'">'+(ok?'📈 향상':'📉 감소')+'</span>'
-          +'<span class="ol-sub"> <span class="'+(ok?'up':'dn')+'">'+(p>0?'▲':'▼')+Math.abs(p).toFixed(1)+'%</span></span></div>';
-      }
+      if(t==='treadmill'){ls=last.dist;ps=prev.dist;}
+      else if(t==='stepmill'){ls=last.level*last.duration;ps=prev.level*prev.duration;}
+      else{ls=last.resistance*(last.dist||last.duration);ps=prev.resistance*(prev.dist||prev.duration);}
+      var p=pct(ls,ps),ok=p>0;
+      tH='<div class="ol-wrap"><span class="pill '+(ok?'pill-g':'pill-r')+'">'+(ok?'📈 향상':'📉 감소')+'</span><span class="ol-sub"> <span class="'+(ok?'up':'dn')+'">'+(p>0?'▲':'▼')+Math.abs(p).toFixed(1)+'%</span></span></div>';
     }
-
     var rows=logs.slice().reverse().map(function(c){
       var stats='';
-      if(t==='treadmill'){
-        stats='<div class="cst"><span class="cl">속도</span><br><span class="cv hi">'+(c.speed||0)+'km/h</span></div>'
-          +'<div class="cst"><span class="cl">시간</span><br><span class="cv">'+(c.time||0)+'분</span></div>'
-          +'<div class="cst"><span class="cl">거리</span><br><span class="cv" style="color:var(--green)">'+(Math.round((c.speed||0)*(c.time||0)/60*10)/10)+'km</span></div>';
-      } else if(t==='incline'){
-        stats='<div class="cst"><span class="cl">인클라인</span><br><span class="cv hi">'+(c.incline||0)+'°</span></div>'
-          +'<div class="cst"><span class="cl">속도</span><br><span class="cv">'+(c.speed||0)+'km/h</span></div>'
-          +'<div class="cst"><span class="cl">시간</span><br><span class="cv">'+(c.time||0)+'분</span></div>'
-          +'<div class="cst"><span class="cl">거리</span><br><span class="cv" style="color:var(--green)">'+(Math.round((c.speed||0)*(c.time||0)/60*10)/10)+'km</span></div>';
-      } else if(t==='stepmill'){
-        stats='<div class="cst"><span class="cl">강도</span><br><span class="cv hi">Lv.'+(c.level||0)+'</span></div>'
-          +'<div class="cst"><span class="cl">시간</span><br><span class="cv">'+(c.time||0)+'분</span></div>';
-      } else {
-        stats='<div class="cst"><span class="cl">저항</span><br><span class="cv hi">Lv.'+(c.level||0)+'</span></div>'
-          +'<div class="cst"><span class="cl">시간</span><br><span class="cv">'+(c.time||0)+'분</span></div>';
-      }
-      return '<div class="c-row"><span class="c-date">'+c.date+'</span>'
-        +'<div class="c-stats">'+stats
-        +(IS_VIEW?'':'<button class="bdels" onclick="delC('+c.id+')">✕</button>')
-        +'</div></div>';
+      if(t==='treadmill')stats='<div class="cst"><span class="cl">인클라인</span><br><span class="cv hi">'+c.incline+'°</span></div><div class="cst"><span class="cl">속도</span><br><span class="cv">'+c.speed+'km/h</span></div><div class="cst"><span class="cl">시간</span><br><span class="cv">'+c.duration+'분</span></div><div class="cst"><span class="cl">거리</span><br><span class="cv" style="color:var(--green)">'+c.dist+'km</span></div>';
+      else if(t==='stepmill')stats='<div class="cst"><span class="cl">강도</span><br><span class="cv hi">Lv.'+c.level+'</span></div><div class="cst"><span class="cl">시간</span><br><span class="cv">'+c.duration+'분</span></div>';
+      else stats='<div class="cst"><span class="cl">저항</span><br><span class="cv hi">Lv.'+c.resistance+'</span></div><div class="cst"><span class="cl">시간</span><br><span class="cv">'+c.duration+'분</span></div>'+(c.dist?'<div class="cst"><span class="cl">거리</span><br><span class="cv" style="color:var(--green)">'+c.dist+'km</span></div>':'');
+      return '<div class="c-row"><span class="c-date">'+c.date+'</span><div class="c-stats">'+stats+(IS_VIEW?'':'<button class="bdels" onclick="delC('+c.id+')">✕</button>')+'</div></div>';
     }).join('');
-
     html+='<div class="c-card"><div class="c-hd"><span class="c-name">'+cardioNames[t]+'</span>'+tH+'</div>'+rows+'</div>';
   });
   el.innerHTML=html;
 }
 
+// ══ 영양
+function switchNut(t,btn){
+  ['today','goal','add','saved'].forEach(function(id){document.getElementById('nut-'+id).style.display='none';});
+  if(t==='add') updateNutAddDate();
+  document.getElementById('nut-'+t).style.display='';
+  document.querySelectorAll('.stab').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  if(t==='add')renderSavedSelect();
+  if(t==='saved')renderSavedList();
+  if(t==='goal')renderNutGoal();
+}
+function updateNutAddDate(){
+  var el=document.getElementById('nut-add-date-label');
+  if(!el) return;
+  var today=new Date();
+  var isToday=nutDate.getFullYear()===today.getFullYear()&&nutDate.getMonth()===today.getMonth()&&nutDate.getDate()===today.getDate();
+  el.textContent=(isToday?'오늘':'📅 '+fmtDate(nutDate))+' 식사 기록';
+}
+function changeNutDay(dir){nutDate=new Date(nutDate);nutDate.setDate(nutDate.getDate()+dir);document.getElementById('nut-date-label').textContent=fmtDate(nutDate);updateNutAddDate();renderNutToday();renderNutGoal();updateNutAddDate();}
+
+function getDaySetting(key, def){
+  var dk=dateKey(nutDate);
+  return daySettings[dk]&&daySettings[dk][key]!==undefined ? daySettings[dk][key] : def;
+}
+function setDaySetting(key, val){
+  var dk=dateKey(nutDate);
+  if(!daySettings[dk]) daySettings[dk]={};
+  daySettings[dk][key]=val;
+  sv('gymv3_ds',daySettings);
+}
+function calcNutGoals(){
+  var curDayMode = getDaySetting('mode', nutMode);
+  var curDayWorkout = getDaySetting('workout', nutWorkout);
+  var bodyAtDate = getBodyAtDate(dateKey(nutDate));
+  var bw = bodyAtDate ? bodyAtDate.bw : 60;
+  var fat = bodyAtDate && bodyAtDate.fat ? bodyAtDate.fat : bw*0.18;
+  var leanMass = bw - fat;
+  var bmr = Math.round(370 + 21.6*leanMass);
+  var m=NUT_MODES[curDayMode];
+  var tdee=curDayWorkout?Math.round(bmr*myInfo.act):Math.round(bmr*1.375);
+  var kcal=tdee+m.deficit;
+  var prot=Math.round(bw*m.protMult);
+  var fat=Math.round(kcal*0.22/9);
+  var carb=Math.max(Math.round((kcal-prot*4-fat*9)/4),0);
+  return {kcal:kcal,prot:prot,carb:carb,fat:fat,tdee:tdee,bmr:bmr};
+}
+
+function getNutTotals(){
+  var m=nutMeals[dateKey(nutDate)]||[];
+  return m.reduce(function(a,i){a.kcal+=i.kcal||0;a.prot+=i.prot||0;a.carb+=i.carb||0;a.fat+=i.fat||0;return a;},{kcal:0,prot:0,carb:0,fat:0});
+}
+
+function drawCirc(id,p,color){
+  var el=document.getElementById(id);if(!el)return;
+  var size=72,dpr=window.devicePixelRatio||1;
+  var c=document.createElement('canvas');
+  el.insertBefore(c,el.firstChild);
+  c.width=size*dpr;c.height=size*dpr;c.style.width=size+'px';c.style.height=size+'px';
+  var ctx=c.getContext('2d');ctx.scale(dpr,dpr);
+  var cx=size/2,cy=size/2,r=size/2-5;
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle='#1e1e1e';ctx.lineWidth=6;ctx.stroke();
+  if(p>0){ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+Math.PI*2*Math.min(p,1.05));ctx.strokeStyle=p>=1?'#00ff9d':color;ctx.lineWidth=6;ctx.lineCap='round';ctx.stroke();}
+  ctx.fillStyle=p>=1?'#00ff9d':'#e8e8e8';ctx.font='bold 12px Arial';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(Math.min(Math.round(p*100),100)+'%',cx,cy);
+}
+
+function renderNutToday(){
+  var g=calcNutGoals(),t=getNutTotals(),m=NUT_MODES[nutMode];
+  // 배너
+  document.getElementById('today-banner').innerHTML=
+    '<div><div style="font-size:.65rem;color:var(--sub);margin-bottom:2px;">'+m.name+' · '+(nutWorkout?'운동일':'휴식일')+'</div>'
+    +'<div style="font-size:1.05rem;font-weight:900;color:'+m.color+';">'+g.kcal.toLocaleString()+' <span style="font-size:.7rem;color:var(--sub);font-weight:400">kcal</span></div></div>'
+    +'<div style="display:flex;gap:10px;">'
+    +'<div style="text-align:center;"><div style="font-size:.6rem;color:var(--sub);">단백질</div><strong style="font-size:.78rem;color:var(--blue);">'+g.prot+'g</strong></div>'
+    +'<div style="text-align:center;"><div style="font-size:.6rem;color:var(--sub);">탄수화물</div><strong style="font-size:.78rem;color:var(--orange);">'+g.carb+'g</strong></div>'
+    +'<div style="text-align:center;"><div style="font-size:.6rem;color:var(--sub);">지방</div><strong style="font-size:.78rem;color:var(--purple);">'+g.fat+'g</strong></div>'
+    +'</div>';
+  // 칼로리
+  var kpct=t.kcal/g.kcal,rem=g.kcal-t.kcal;
+  document.getElementById('kcal-cur').textContent=Math.round(t.kcal).toLocaleString();
+  var remEl=document.getElementById('kcal-rem');
+  remEl.textContent=(rem>=0?'남은 '+Math.round(rem).toLocaleString():'초과 '+Math.abs(Math.round(rem)).toLocaleString())+' kcal';
+  remEl.style.color=rem>=0?'var(--green)':'var(--red)';
+  var bar=document.getElementById('kcal-bar');bar.style.width=Math.min(kpct*100,100)+'%';bar.style.background=kpct>=1?'var(--red)':'var(--yellow)';
+  // 원형
+  var circEl=document.getElementById('nut-circles');
+  circEl.innerHTML=['prot','carb','fat'].map(function(k){return '<div class="circ-wrap" id="nc-'+k+'"><div class="circ-lbl" style="color:'+NUT_COLORS[k]+'">'+NUT_NAMES[k]+'</div><div style="font-size:.6rem;color:var(--sub);">'+Math.round(t[k])+'<span>/'+g[k]+'g</span></div></div>';}).join('');
+  setTimeout(function(){['prot','carb','fat'].forEach(function(k){drawCirc('nc-'+k,t[k]/g[k],NUT_COLORS[k]);});},50);
+  // 진행바
+  document.getElementById('nut-prog').innerHTML=['prot','carb','fat'].map(function(k){
+    var p=Math.min(t[k]/g[k]*100,100),over=t[k]>g[k];
+    return '<div><div class="prog-hd"><span style="font-size:.78rem;font-weight:700;color:'+NUT_COLORS[k]+';">'+NUT_NAMES[k]+'</span><span style="font-size:.72rem;color:var(--sub);"><strong style="color:'+NUT_COLORS[k]+';">'+Math.round(t[k])+'g</strong> / '+g[k]+'g'+(over?' <span style="color:var(--red);font-size:.65rem;">▲초과</span>':'')+'</span></div><div class="prog-bg"><div class="prog-fill" style="width:'+p+'%;background:'+(over?'var(--red)':NUT_COLORS[k])+'"></div></div></div>';
+  }).join('');
+  // 식사기록
+  var meals=nutMeals[dateKey(nutDate)]||[];
+  if(!meals.length){document.getElementById('meal-list').innerHTML='<div class="empty">아직 기록이 없어요 🍽️</div>';return;}
+  document.getElementById('meal-list').innerHTML=meals.map(function(item,i){
+    return '<div class="meal-row"><div class="meal-top"><span style="font-size:.8rem;font-weight:700;">'+item.name+'</span><span style="display:flex;align-items:center;gap:5px;"><span style="font-size:.73rem;font-weight:700;color:var(--yellow);">'+Math.round(item.kcal)+'kcal</span>'+(IS_VIEW?'':'<button class="bdels" onclick="delMeal('+i+')">✕</button>')+'</span></div><div class="meal-macros"><div class="mm"><span class="mml">P </span><span style="color:var(--blue);">'+Math.round(item.prot*10)/10+'g</span></div><div class="mm"><span class="mml">C </span><span style="color:var(--orange);">'+Math.round(item.carb*10)/10+'g</span></div><div class="mm"><span class="mml">F </span><span style="color:var(--purple);">'+Math.round(item.fat*10)/10+'g</span></div></div></div>';
+  }).join('');
+}
+function delMeal(i){if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}var k=dateKey(nutDate);if(nutMeals[k])nutMeals[k].splice(i,1);sv(NK,nutMeals);if(!IS_VIEW)serverSave();renderNutToday();}
+
+function setNutMode(mode,btn){if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}
+  nutMode=mode;
+  setDaySetting('mode', mode);
+  document.querySelectorAll('.mode-btn').forEach(function(b){b.classList.remove('on');b.style.borderColor='';b.style.color='';});
+  btn.classList.add('on');btn.style.borderColor=NUT_MODES[mode].color;btn.style.color=NUT_MODES[mode].color;
+  renderNutGoal();renderNutToday();
+}
+function setNutWorkout(val,btn){if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}nutWorkout=val;setDaySetting('workout',val);document.querySelectorAll('.wt-btn').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');renderNutGoal();renderNutToday();}
+
+function renderNutGoal(){
+  // 날짜별 저장된 모드/운동여부 불러와서 UI 반영
+  var curDayMode = getDaySetting('mode', nutMode);
+  var curDayWorkout = getDaySetting('workout', nutWorkout);
+  document.querySelectorAll('.mode-btn').forEach(function(b){b.classList.remove('on');b.style.borderColor='';b.style.color='';});
+  var modeMap={'bulk':0,'recomp':1,'cut':2,'maintain':3};
+  var modeButtons=document.querySelectorAll('.mode-btn');
+  if(modeButtons[modeMap[curDayMode]]){modeButtons[modeMap[curDayMode]].classList.add('on');modeButtons[modeMap[curDayMode]].style.borderColor=NUT_MODES[curDayMode].color;modeButtons[modeMap[curDayMode]].style.color=NUT_MODES[curDayMode].color;}
+  document.querySelectorAll('.wt-btn').forEach(function(b,i){b.classList.toggle('on',(i===0&&curDayWorkout)||(i===1&&!curDayWorkout));});
+
+  var g=calcNutGoals(),m=NUT_MODES[nutMode];
+  document.getElementById('goal-tdee-row').innerHTML=[{l:'기초대사량',v:g.bmr,c:'var(--sub)'},{l:'활동 TDEE',v:g.tdee,c:'var(--text)'},{l:'목표 칼로리',v:g.kcal,c:m.color}].map(function(t){return '<div class="td"><div class="tdl">'+t.l+'</div><div class="tdv" style="color:'+t.c+';">'+t.v.toLocaleString()+'<span style="font-size:.58rem;color:var(--sub);"> kcal</span></div></div>';}).join('');
+  var macros=[{k:'prot',n:'단백질',v:g.prot,kcal:g.prot*4,c:NUT_COLORS.prot,r:g.prot*4/g.kcal},{k:'carb',n:'탄수화물',v:g.carb,kcal:g.carb*4,c:NUT_COLORS.carb,r:g.carb*4/g.kcal},{k:'fat',n:'지방',v:g.fat,kcal:g.fat*9,c:NUT_COLORS.fat,r:g.fat*9/g.kcal}];
+  document.getElementById('goal-macro-result').innerHTML=macros.map(function(mac){return '<div style="margin-bottom:9px;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:.78rem;font-weight:700;color:'+mac.c+';">'+mac.n+'</span><span style="font-size:.73rem;color:'+mac.c+';"><strong>'+mac.v+'g</strong> <span style="color:var(--sub);font-size:.63rem;">('+mac.kcal+'kcal · '+Math.round(mac.r*100)+'%)</span></span></div><div style="height:8px;background:var(--bg);border-radius:4px;overflow:hidden;"><div style="height:100%;width:'+Math.round(mac.r*100)+'%;background:'+mac.c+';border-radius:4px;"></div></div></div>';}).join('');
+  document.getElementById('goal-tips').innerHTML=NUT_TIPS[nutMode].map(function(t){return '<div class="tip-item">• '+t+'</div>';}).join('');
+  // 주간플랜 사용자 직접 설정
+  var weekPlanKey='gymv3_wp';
+  var savedWeekPlan=ld(weekPlanKey,null)||WEEK_PLAN.map(function(d){return{d:d.d,w:d.w};});
+  document.getElementById('goal-week').innerHTML=savedWeekPlan.map(function(d,i){
+    var tdee2=d.w?Math.round(g.bmr*myInfo.act):Math.round(g.bmr*1.375);
+    var k2=tdee2+NUT_MODES[curDayMode].deficit;
+    return '<div class="wg-day" onclick="toggleWeekDay('+i+')" style="cursor:pointer;border:1px solid '+(d.w?'rgba(0,255,157,.3)':'var(--border)')+';">'
+      +'<div class="wg-d">'+d.d+'</div>'
+      +'<div style="font-size:.85rem;">'+(d.w?'🏋️':'😴')+'</div>'
+      +'<div class="wg-kcal" style="color:'+(d.w?'var(--green)':'var(--sub)')+';">'+k2+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+function renderSavedSelect(){
+  var sel=document.getElementById('saved-select');
+  sel.innerHTML='<option value="">직접 입력</option>'+savedFoods.map(function(f,i){return '<option value="'+i+'">'+f.name+' (100g당 '+f.kcal+'kcal)</option>';}).join('');
+}
+function onSavedSelect(){var idx=document.getElementById('saved-select').value;if(idx===''){document.getElementById('calc-preview').style.display='none';return;}calcFromGram();}
+function calcFromGram(){
+  var idx=document.getElementById('saved-select').value,g=parseFloat(document.getElementById('intake-gram').value)||0,box=document.getElementById('calc-preview');
+  if(idx===''||g<=0){box.style.display='none';return;}
+  var f=savedFoods[parseInt(idx)],r=g/100;
+  var kcal=Math.round(f.kcal*r),prot=Math.round(f.prot*r*10)/10,carb=Math.round(f.carb*r*10)/10,fat=Math.round(f.fat*r*10)/10;
+  box.style.display='';
+  document.getElementById('cp-row').innerHTML='<div style="color:var(--yellow);">'+kcal+'kcal</div><div><span style="color:var(--sub);">P </span><span style="color:var(--blue);">'+prot+'g</span></div><div><span style="color:var(--sub);">C </span><span style="color:var(--orange);">'+carb+'g</span></div><div><span style="color:var(--sub);">F </span><span style="color:var(--purple);">'+fat+'g</span></div>';
+  document.getElementById('food-name').value=f.name+' '+g+'g';
+  document.getElementById('food-kcal').value=kcal;document.getElementById('food-prot').value=prot;document.getElementById('food-carb').value=carb;document.getElementById('food-fat').value=fat;
+}
+function addMeal(){
+  if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}
+  var mealDate=dateKey(nutDate);
+  var name=document.getElementById('food-name').value,kcal=parseFloat(document.getElementById('food-kcal').value)||0,prot=parseFloat(document.getElementById('food-prot').value)||0,carb=parseFloat(document.getElementById('food-carb').value)||0,fat=parseFloat(document.getElementById('food-fat').value)||0,err=document.getElementById('n-err');
+  if(!name){err.textContent='음식명을 입력해주세요.';return;}
+  err.textContent='';
+  var k=dateKey(nutDate);if(!nutMeals[k])nutMeals[k]=[];
+  nutMeals[k].push({name:name,kcal:kcal,prot:prot,carb:carb,fat:fat});
+  sv(NK,nutMeals);
+  ['food-name','food-kcal','food-prot','food-carb','food-fat'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('calc-preview').style.display='none';document.getElementById('saved-select').value='';document.getElementById('intake-gram').value='';
+  if(!IS_VIEW)serverSave();flash();
+  // 오늘 탭으로 이동
+  switchNut('today',document.querySelector('.stab'));
+  renderNutToday();
+}
+function saveFood(){if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}
+  var name=document.getElementById('sf-name').value,cat=document.getElementById('sf-cat').value,kcal=parseFloat(document.getElementById('sf-kcal').value)||0,prot=parseFloat(document.getElementById('sf-prot').value)||0,carb=parseFloat(document.getElementById('sf-carb').value)||0,fat=parseFloat(document.getElementById('sf-fat').value)||0;
+  if(!name){alert('음식명을 입력해주세요!');return;}
+  savedFoods.push({name:name,cat:cat,kcal:kcal,prot:prot,carb:carb,fat:fat});
+  sv(FK,savedFoods);['sf-name','sf-kcal','sf-prot','sf-carb','sf-fat'].forEach(function(id){document.getElementById(id).value='';});
+  renderSavedList();flash();
+}
+function delSaved(i){if(!confirm('삭제할까요?'))return;savedFoods.splice(i,1);sv(FK,savedFoods);renderSavedList();}
+function renderSavedList(){
+  var el=document.getElementById('saved-list');
+  if(!savedFoods.length){el.innerHTML='<div class="empty">저장된 음식이 없어요</div>';return;}
+  el.innerHTML=savedFoods.map(function(f,i){return '<div class="saved-item"><div><div class="si-name">'+f.name+'<span class="cat-tag cat-'+f.cat+'">'+f.cat+'</span></div><div style="font-size:.65rem;color:var(--sub);margin:2px 0 4px;">100g 기준</div><div class="si-macros"><div class="sm"><span class="sml">kcal </span><span style="color:var(--yellow);">'+f.kcal+'</span></div><div class="sm"><span class="sml">P </span><span style="color:var(--blue);">'+f.prot+'g</span></div><div class="sm"><span class="sml">C </span><span style="color:var(--orange);">'+f.carb+'g</span></div><div class="sm"><span class="sml">F </span><span style="color:var(--purple);">'+f.fat+'g</span></div></div></div><button class="bdels" onclick="delSaved('+i+')">🗑️</button></div>';}).join('');
+}
+
+// ══ 캘린더
+function getDayCats(dateStr){
+  var ws=workouts.filter(function(w){return w.date===dateStr;}),cs=cardios.filter(function(c){return c.date===dateStr;}),cats={};
+  ws.forEach(function(w){var c=EX_CAT[w.ex]||'core';cats[c]=true;});
+  if(cs.length)cats['cardio']=true;
+  return Object.keys(cats);
+}
+function renderCalendar(){
+  var td=new Date(),firstDay=new Date(calYear,calMonth,1).getDay(),daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  var months=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  document.getElementById('cal-title').textContent=calYear+'년 '+months[calMonth];
+  var table=document.getElementById('cal-table');
+  var days=['일','월','화','수','목','금','토'];
+  var html='<thead><tr>';
+  days.forEach(function(d){ html+='<th class="cal-dow">'+d+'</th>'; });
+  html+='</tr></thead><tbody><tr>';
+  var col=0;
+  // 앞 빈칸
+  for(var i=0;i<firstDay;i++){
+    html+='<td class="cal-day empty"><div class="dn"></div></td>';
+    col++;
+  }
+  // 날짜
+  for(var d=1;d<=daysInMonth;d++){
+    var mm=(calMonth+1<10?'0'+(calMonth+1):''+(calMonth+1));
+    var dd=(d<10?'0'+d:''+d);
+    var dateStr=calYear+'-'+mm+'-'+dd;
+    var cats=getDayCats(dateStr);
+    var isToday=(td.getFullYear()===calYear&&td.getMonth()===calMonth&&td.getDate()===d);
+    var isSel=calSelected===dateStr;
+    var cls=(isToday?'today':'')+(isSel?' selected':'');
+    var dots=cats.map(function(c){return '<div class="cat-dot '+CAT_CLS[c]+'"></div>';}).join('');
+    html+='<td class="'+cls+'" data-date="'+dateStr+'"><div class="cal-dn">'+d+'</div><div class="cal-cats">'+dots+'</div></td>';
+    col++;
+    if(col%7===0&&d<daysInMonth) html+='</tr><tr>';
+  }
+  // 뒷 빈칸
+  var remaining=(col%7===0)?0:7-(col%7);
+  for(var j=0;j<remaining;j++) html+='<td class="cal-day empty"></td>';
+  html+='</tr></tbody>';
+  table.innerHTML=html;
+  table.onclick=function(e){
+    var el=e.target.closest('[data-date]');
+    if(el) selectDay(el.getAttribute('data-date'));
+  };
+  if(calSelected) renderDayDetail(calSelected);
+
+}
+
+function selectDay(dateStr){calSelected=dateStr;renderCalendar();renderDayDetail(dateStr);renderDailyNote(dateStr);}
+function renderDayDetail(dateStr){
+  var el=document.getElementById('day-detail');
+  var ws=workouts.filter(function(w){return w.date===dateStr;}),cs=cardios.filter(function(c){return c.date===dateStr;});
+  if(!ws.length&&!cs.length){el.innerHTML='<div class="day-detail"><div class="empty">이 날은 운동 기록이 없어요 🛋️</div></div>';return;}
+  var parts=dateStr.split('-'),dateLabel=parts[0]+'년 '+parseInt(parts[1])+'월 '+parseInt(parts[2])+'일';
+  var items='';
+  ws.forEach(function(w){
+    var cat=EX_CAT[w.ex]||'core',catCls=CAT_CLS[cat],catKr=CAT_KR[cat],type=w.type||'normal',unit=type==='bw'?'회':'kg';
+    var setsHTML=w.sets.map(function(s,i){var d=type==='bw'?s.reps+'회':s.kg+'kg × '+s.reps+'회';var v=type==='bw'?'':' = '+fmt(s.kg*s.reps)+'kg';return '<div class="wi-set"><span>S'+(i+1)+'</span><span>'+d+v+'</span></div>';}).join('');
+    items+='<div class="workout-item"><div class="wi-header"><div class="wi-cat '+catCls+'"></div><span class="wi-name">'+w.ex+'</span><span style="font-size:.65rem;color:var(--sub);margin-left:auto;">'+catKr+'</span></div><div class="wi-sets">'+setsHTML+'</div><div class="wi-total">총 볼륨 '+fmt(w.totalVol)+unit+'</div></div>';
+  });
+  cs.forEach(function(c){
+    var typeLabel=c.type==='treadmill'?'🏃 런닝머신':c.type==='stepmill'?'🪜 스텝밀':'🚴 사이클';
+    var detail=c.type==='treadmill'?'인클라인 '+c.incline+'° · 속도 '+c.speed+'km/h · '+c.duration+'분'+(c.dist?' · '+c.dist+'km':''):c.type==='stepmill'?'강도 Lv.'+c.level+' · '+c.duration+'분':'저항 Lv.'+c.resistance+' · '+c.duration+'분'+(c.dist?' · '+c.dist+'km':'');
+    items+='<div class="workout-item"><div class="wi-header"><div class="wi-cat cat-cardio"></div><span class="wi-name">'+typeLabel+'</span><span style="font-size:.65rem;color:var(--sub);margin-left:auto;">유산소</span></div><div class="wi-sets"><div class="wi-set"><span>'+detail+'</span></div></div></div>';
+  });
+  el.innerHTML='<div class="day-detail"><div class="day-detail-hd"><span>운동 기록</span><span style="font-size:.72rem;color:var(--sub);">'+dateLabel+'</span></div>'+items+'</div>';
+  setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'nearest'});},100);
+}
+function calMove(dir){calMonth+=dir;if(calMonth<0){calMonth=11;calYear--;}if(calMonth>11){calMonth=0;calYear++;}calSelected=null;document.getElementById('day-detail').innerHTML='';renderCalendar();}
+
+// ══ 내 정보
+var infoEditOpen=false;
+function toggleInfoEdit(){
+  infoEditOpen=!infoEditOpen;
+  var el=document.getElementById('slide-edit'),btn=document.getElementById('edit-btn');
+  el.classList.toggle('open',infoEditOpen);
+  btn.classList.toggle('open',infoEditOpen);
+  btn.innerHTML=infoEditOpen?'✕ 닫기':'✏️ 수정';
+  if(infoEditOpen){
+    document.getElementById('inp-h').value=myInfo.h||170;
+    document.getElementById('inp-age').value=myInfo.age||30;
+    document.getElementById('inp-gender').value=myInfo.gender||'m';
+    document.getElementById('inp-act').value=myInfo.act||1.55;
+    liveCalc();
+  }
+}
+function liveCalc(){
+  var h=parseFloat(document.getElementById('inp-h').value)||170,age=parseInt(document.getElementById('inp-age').value)||30,gender=document.getElementById('inp-gender').value,act=parseFloat(document.getElementById('inp-act').value)||1.55;
+  var bw=bodies.length?bodies[bodies.length-1].bw:60;
+  var latestFat2=bodies.length&&bodies[bodies.length-1].fat?bodies[bodies.length-1].fat:bw*0.18;
+  var leanMass2=bw-latestFat2;
+  var bmr=Math.round(370+21.6*leanMass2);
+  var tdeeW=Math.round(bmr*act),prot=Math.round(bw*2.0);
+  document.getElementById('live-bmr').textContent=bmr.toLocaleString();
+  document.getElementById('live-tdee').textContent=tdeeW.toLocaleString();
+  document.getElementById('live-prot').textContent=prot;
+}
+function saveInfo(){if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}
+  myInfo={h:parseFloat(document.getElementById('inp-h').value)||170,age:parseInt(document.getElementById('inp-age').value)||30,gender:document.getElementById('inp-gender').value,act:parseFloat(document.getElementById('inp-act').value)||1.55};
+  sv(IK,myInfo);toggleInfoEdit();renderBodyInfo();flash();
+}
+function renderBodyInfo(){
+  var bw=bodies.length?bodies[bodies.length-1].bw:60;
+  var latestFat=bodies.length&&bodies[bodies.length-1].fat?bodies[bodies.length-1].fat:bw*0.18;
+  var leanMass=bw-latestFat;
+  var bmr=Math.round(370+21.6*leanMass);
+  var tdeeW=Math.round(bmr*myInfo.act),tdeeR=Math.round(bmr*1.375);
+  var prot=Math.round(bw*2.0);
+  var actLabels={'1.2':'거의 안함','1.375':'주 1~2회','1.55':'주 3~5회','1.725':'주 6~7회'};
+  document.getElementById('info-grid').innerHTML=
+    '<div class="ig"><div class="igl">키</div><div class="igv">'+myInfo.h+'<span class="igu">cm</span></div></div>'
+    +'<div class="ig"><div class="igl">나이</div><div class="igv">'+myInfo.age+'<span class="igu">세</span></div></div>'
+    +'<div class="ig"><div class="igl">성별</div><div class="igv">'+(myInfo.gender==='m'?'남':'여')+'</div></div>'
+    +'<div class="ig"><div class="igl">활동량</div><div class="igv" style="font-size:.7rem;color:var(--green);">'+(actLabels[String(myInfo.act)]||'주 3~5회')+'</div></div>';
+  document.getElementById('bmr-box').innerHTML=
+    '<div class="bmr-row"><div class="bmr-main"><div class="bml">기초대사량 (BMR)</div><div><span class="bmv">'+bmr.toLocaleString()+'</span><span class="bmu"> kcal/일</span></div></div>'
+    +'<div class="bmr-side"><div class="bsl">활동대사량 (TDEE)</div><div class="bsv" style="color:var(--blue);">운동일 '+tdeeW.toLocaleString()+' / 휴식일 '+tdeeR.toLocaleString()+'</div></div></div>'
+    +'<div class="bmr-stats">'
+    +'<div class="bs"><div class="bsl2">린매스 목표</div><div class="bsv2" style="color:var(--green);">운동 '+(tdeeW-175)+'<br>휴식 '+(tdeeR-175)+'</div></div>'
+    +'<div class="bs"><div class="bsl2">단백질 목표</div><div class="bsv2" style="color:var(--blue);">'+prot+'g</div></div>'
+    +'<div class="bs"><div class="bsl2">영양탭 연동</div><div class="bsv2" style="color:var(--yellow);font-size:.7rem;">자동 반영 ✅</div></div>'
+    +'</div>';
+}
+
+// ══ 체성분
+function bPrev(){var bw=parseFloat(document.getElementById('b-bw').value)||0,f=parseFloat(document.getElementById('b-fat').value)||0,w=document.getElementById('b-prev');if(bw>0&&f>0){w.style.display='';var fr=(f/bw*100).toFixed(1);document.getElementById('b-fr').textContent=fr+'%';document.getElementById('b-fr').style.color=fr<15?'var(--green)':fr<20?'var(--yellow)':fr<25?'var(--orange)':'var(--red)';}else w.style.display='none';}
+function saveBody(){
+  if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}
+  var date=document.getElementById('b-date').value,bw=parseFloat(document.getElementById('b-bw').value),muscle=parseFloat(document.getElementById('b-muscle').value)||null,fat=parseFloat(document.getElementById('b-fat').value)||null,err=document.getElementById('b-err');
+  if(!date||!bw){err.textContent='날짜와 체중은 필수입니다.';return;}
+  err.textContent='';bodies.push({id:Date.now(),date:date,bw:bw,muscle:muscle,fat:fat});sv(BK,bodies);
+  ['b-bw','b-muscle','b-fat'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('b-prev').style.display='none';
+  if(!IS_VIEW)serverSave();flash();renderBodyInfo();renderBody();if(document.getElementById('tab-n').style.display!=='none'){renderNutToday();renderNutGoal();updateNutAddDate();}renderNutToday();renderNutGoal();updateNutAddDate();
+}
+function delB(id){if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}if(!confirm('삭제할까요?'))return;bodies=bodies.filter(function(b){return b.id!==id;});sv(BK,bodies);if(!IS_VIEW)serverSave();renderBody();}
+function renderRangeSummary(){
+  var fromDate=document.getElementById('b-from').value,toDate=document.getElementById('b-to').value,el=document.getElementById('b-range-result');
+  if(!fromDate||!toDate||fromDate===toDate){el.innerHTML='<div style="color:var(--sub);font-size:.78rem;">날짜를 선택해주세요.</div>';return;}
+  if(fromDate>toDate){el.innerHTML='<div style="color:var(--red);font-size:.78rem;">시작 날짜가 종료 날짜보다 늦어요!</div>';return;}
+  var s=bodies.slice().sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+  var f=s.find(function(l){return l.date===fromDate;}),t=s.find(function(l){return l.date===toDate;});
+  if(!f||!t){el.innerHTML='<div style="color:var(--sub);font-size:.78rem;">해당 날짜 기록이 없어요.</div>';return;}
+  function chg(lbl,val,unit,inv){var n=parseFloat(val),pos=n>0,good=inv?!pos:pos;var cls=pos?(good?'pg':'pb'):(good?'ng':'nb');return '<div class="si"><span class="lb">'+lbl+' </span><span class="'+cls+'">'+(pos?'+':'')+n.toFixed(1)+unit+'</span></div>';}
+  var frF=parseFloat(fatRate(f.fat,f.bw))||0,frT=parseFloat(fatRate(t.fat,t.bw))||0;
+  el.innerHTML='<div style="color:#444;font-size:.62rem;letter-spacing:.05em;text-transform:uppercase;margin-bottom:7px;">'+fromDate+' → '+toDate+'</div>'
+    +'<div class="sitems">'+chgR('체중',t.bw-f.bw,'kg',true)+(f.muscle&&t.muscle?chgR('근육량',t.muscle-f.muscle,'kg',false):'')+(f.fat&&t.fat?chgR('체지방',t.fat-f.fat,'kg',true):'')+(f.fat&&t.fat?chgR('체지방률',frT-frF,'%',true):'')+'</div>';
+}
+function renderBody(){
+  var el=document.getElementById('b-list');
+  if(!bodies.length){el.innerHTML='<div class="empty">📊<br>체성분 기록이 없어요</div>';document.getElementById('b-range-card').style.display='none';return;}
+  var s=bodies.slice().sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+  // 구간 선택 드롭다운 업데이트
+  if(s.length>=2){
+    document.getElementById('b-range-card').style.display='';
+    var fromSel=document.getElementById('b-from'),toSel=document.getElementById('b-to');
+    var fv=fromSel.value,tv=toSel.value;
+    var opts=s.map(function(l){return '<option value="'+l.date+'">'+l.date+'</option>';}).join('');
+    fromSel.innerHTML=opts;toSel.innerHTML=opts;
+    fromSel.value=fv&&s.find(function(x){return x.date===fv;})?fv:s[0].date;
+    toSel.value=tv&&s.find(function(x){return x.date===tv;})?tv:s[s.length-1].date;
+    renderRangeSummary();
+  } else document.getElementById('b-range-card').style.display='none';
+
+  function dH(c,p,inv){
+    if(!c||!p)return '';
+    var pc=pct(c,p),pos=pc>0;
+    var good=inv?pos:!pos;
+    var col=good?'var(--green)':'var(--red)';
+    return '<div class="sdiff" style="color:'+col+';">'+(pos?'▲':'▼')+Math.abs(pc).toFixed(1)+'%</div>';
+  }
+  function fC(f,bw){var r=parseFloat(fatRate(f,bw));if(!r)return '';return r<15?'fa':r<20?'fb':r<25?'fc':'fd';}
+  var rows=s.map(function(l,i){var prev=i>0?s[i-1]:null,fr=fatRate(l.fat,l.bw);
+    return '<div class="brow"><div class="brow-top"><span class="bdate">'+l.date+'</span>'+(IS_VIEW?'':'<button class="bdels" onclick="delB('+l.id+')">✕</button>')+'</div><div class="s4"><div><div class="sl">체중</div><div class="sv">'+l.bw+'<sub>kg</sub></div>'+(prev?dH(l.bw,prev.bw,false):'')+'</div><div><div class="sl">근육량</div><div class="sv'+(l.muscle?'':' dash')+'" style="'+(l.muscle?'color:var(--blue);':'')+'">'+( l.muscle?l.muscle+'<sub>kg</sub>':'–')+'</div>'+(prev&&l.muscle&&prev.muscle?dH(l.muscle,prev.muscle,true):'')+'</div><div><div class="sl">체지방</div><div class="sv'+(l.fat?'':' dash')+'">'+(l.fat?l.fat+'<sub>kg</sub>':'–')+'</div></div><div><div class="sl">체지방률</div><div class="sv '+fC(l.fat,l.bw)+'">'+(fr?fr+'%':'–')+'</div></div></div></div>';
+  }).join('');
+  var sum='';
+  if(s.length>=2){var f=s[0],last=s[s.length-1];function chgR(lbl,val,unit,inv){var n=parseFloat(val),pos=n>0,good=inv?!pos:pos;var cls=pos?(good?'pg':'pb'):(good?'ng':'nb');return '<div class="si"><span class="lb">'+lbl+' </span><span class="'+cls+'">'+(pos?'+':'')+n.toFixed(1)+unit+'</span></div>';}sum='<div class="sbar"><div class="slbl">전체 변화 · '+f.date+' → '+last.date+'</div><div class="sitems">'+chg('체중',last.bw-f.bw,'kg',true)+(f.muscle&&last.muscle?chg('근육량',last.muscle-f.muscle,'kg',false):'')+(f.fat&&last.fat?chg('체지방',last.fat-f.fat,'kg',true):'')+(f.fat&&last.fat?chg('체지방률',parseFloat(fatRate(last.fat,last.bw))-parseFloat(fatRate(f.fat,f.bw)),'%',true):'')+'</div></div>';}
+  el.innerHTML='<div class="bwrap"><div class="bhd">체성분 기록</div>'+rows+sum+'</div>';
+}
+
+// ══ 타이머
+var tTotal=60,tLeft=60,tRunning=false,tIv=null,CIRC=490,tStartAt=null,tPausedLeft=60,wakeLock=null;
+function openTimer(){document.getElementById('timer-popup').classList.add('open');document.getElementById('overlay').style.display='block';}
+function closeTimer(){document.getElementById('timer-popup').classList.remove('open');document.getElementById('overlay').style.display='none';}
+function setPreset(s,btn){
+  // 이미 선택된 버튼 다시 누르면 해제
+  if(btn && btn.classList.contains('on')){
+    btn.classList.remove('on');
+    timerReset();
+    tTotal=0;tLeft=0;
+    document.getElementById('t-disp').textContent='0:00';
+    document.getElementById('t-ring').style.strokeDashoffset=CIRC;
+    return;
+  }
+  timerReset();
+  tTotal=s;tLeft=s;tPausedLeft=s;tStartAt=null;
+  document.querySelectorAll('.pr-btn').forEach(function(b){b.classList.remove('on');});
+  if(btn) btn.classList.add('on');
+  updDisp();
+}
+function timerToggle(){
+  if(tLeft<=0){timerReset();return;}
+  // 알림 권한 요청
+  if('Notification' in window && Notification.permission==='default'){
+    Notification.requestPermission();
+  }
+  if(tRunning){
+    // 일시정지
+    clearInterval(tIv);
+    tRunning=false;
+    tPausedLeft=tLeft;
+    tStartAt=null;
+    releaseWakeLock();
+    document.getElementById('t-btn').textContent='계속';
+    document.getElementById('t-status').textContent='일시정지';
+  } else {
+    // 시작 or 재개 - 시작시각 기록
+    tRunning=true;
+    tStartAt=Date.now();
+    requestWakeLock();
+    document.getElementById('t-btn').textContent='일시정지';
+    document.getElementById('t-status').textContent='쉬는 중...';
+    document.getElementById('t-done').style.display='none';
+    clearInterval(tIv);
+    tIv=setInterval(function(){
+      // 실제 경과시간 기준으로 계산 (백그라운드/잠금 대응)
+      var elapsed=Math.floor((Date.now()-tStartAt)/1000);
+      tLeft=tPausedLeft-elapsed;
+      if(tLeft<=0){
+        tLeft=0;updDisp();
+        clearInterval(tIv);tRunning=false;timerDone();
+      } else {
+        updDisp();
+      }
+    },500);
+  }
+}
+function timerReset(){clearInterval(tIv);tRunning=false;tLeft=tTotal;tPausedLeft=tTotal;tStartAt=null;releaseWakeLock();document.getElementById('t-btn').textContent='시작';document.getElementById('t-status').textContent='준비';document.getElementById('t-done').style.display='none';document.getElementById('t-ring').style.stroke='var(--green)';updDisp();}
+function timerDone(){
+  releaseWakeLock();
+  document.getElementById('t-btn').textContent='다시';
+  document.getElementById('t-status').textContent='완료!';
+  document.getElementById('t-done').style.display='';
+  // 진동
+  if(navigator.vibrate) navigator.vibrate([400,100,400,100,400]);
+  // 소리
+  try{var ctx=new(window.AudioContext||window.webkitAudioContext)();[523,659,784].forEach(function(f,i){var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=f;g.gain.setValueAtTime(.5,ctx.currentTime+i*.2);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+i*.2+.5);o.start(ctx.currentTime+i*.2);o.stop(ctx.currentTime+i*.2+.5);});}catch(e){}
+  // 알림
+  if('Notification' in window){
+    if(Notification.permission==='granted'){
+      new Notification('🎯 GYM TRACKER',{body:'쉬는 시간 끝! 다음 세트 시작하세요 💪',icon:'/gym-tracker/icon-192.png'});
+    } else if(Notification.permission!=='denied'){
+      Notification.requestPermission().then(function(p){
+        if(p==='granted') new Notification('🎯 GYM TRACKER',{body:'쉬는 시간 끝! 다음 세트 시작하세요 💪',icon:'/gym-tracker/icon-192.png'});
+      });
+    }
+  }
+}
+function updDisp(){var m=Math.floor(tLeft/60),s=tLeft%60;document.getElementById('t-disp').textContent=m+':'+(s<10?'0':'')+s;var ratio=tTotal>0?tLeft/tTotal:1;document.getElementById('t-ring').style.strokeDashoffset=CIRC*(1-ratio);document.getElementById('t-ring').style.stroke=tLeft<=10&&tLeft>0?'var(--red)':tLeft<=30&&tLeft>0?'var(--yellow)':'var(--green)';}
+
+// ══ 서버 저장 & 공유
+function showToast(msg,dur){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#222;color:#eee;padding:10px 18px;border-radius:20px;font-size:.8rem;z-index:999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.4);';document.body.appendChild(t);setTimeout(function(){t.remove();},dur||2500);}
+function serverSave(){
+  var data={workouts:workouts,cardios:cardios,bodies:bodies,nutMeals:nutMeals,myInfo:myInfo,savedFoods:savedFoods};
+  fetch(BASE+'/b/'+BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JKEY},body:JSON.stringify(data)}).catch(function(){showToast('⚠️ 서버 저장 실패');});
+}
+function serverLoad(cb){
+  fetch(BASE+'/b/'+BIN_ID+'/latest',{headers:{'X-Master-Key':JKEY}}).then(function(r){return r.json();}).then(function(r){if(r.record)cb(r.record);}).catch(function(){});
+}
+function initViewMode(){
+  var params=new URLSearchParams(window.location.search),binId=params.get('share');
+  if(!binId){
+    if(!IS_VIEW) document.getElementById('share-btn').style.display='';
+    // 로컬 데이터 먼저 즉시 렌더링
+    renderWorkouts();renderCardio();renderBody();renderBodyInfo();renderNutToday();
+    renderCalendar();renderNutGoal();patchViewMode();
+    // 백그라운드로 서버 동기화
+    serverLoad(function(data){
+      var changed=false;
+      // 로컬이 비어있거나 서버 데이터가 더 많으면 무조건 서버로 덮어쓰기
+      if(data.workouts&&(workouts.length===0||data.workouts.length>workouts.length||JSON.stringify(data.workouts)!==JSON.stringify(workouts))){workouts=data.workouts;sv(WK,workouts);changed=true;}
+      if(data.cardios&&(cardios.length===0||data.cardios.length>cardios.length||JSON.stringify(data.cardios)!==JSON.stringify(cardios))){cardios=data.cardios;sv(CK,cardios);changed=true;}
+      if(data.bodies&&(bodies.length===0||data.bodies.length>bodies.length||JSON.stringify(data.bodies)!==JSON.stringify(bodies))){bodies=data.bodies;sv(BK,bodies);changed=true;}
+      if(data.nutMeals&&(Object.keys(nutMeals).length===0||JSON.stringify(data.nutMeals)!==JSON.stringify(nutMeals))){nutMeals=data.nutMeals;sv(NK,nutMeals);changed=true;}
+      if(data.myInfo&&JSON.stringify(data.myInfo)!==JSON.stringify(myInfo)){myInfo=data.myInfo;sv(IK,myInfo);changed=true;}
+      if(data.savedFoods&&(savedFoods.length===0||data.savedFoods.length>savedFoods.length||JSON.stringify(data.savedFoods)!==JSON.stringify(savedFoods))){savedFoods=data.savedFoods;sv(FK,savedFoods);changed=true;}
+      renderWorkouts();renderCardio();renderBody();renderBodyInfo();renderNutToday();renderCalendar();renderNutGoal();patchViewMode();
+      if(changed) showToast('☁️ 서버에서 데이터를 불러왔어요!');
+    });
+    return;
+  }
+  IS_VIEW=true;document.getElementById('view-banner').style.display='';document.getElementById('share-btn').style.display='none';
+  showToast('⏳ 기록 불러오는 중...',1500);
+  fetch(BASE+'/b/'+binId+'/latest',{headers:{'X-Master-Key':JKEY}}).then(function(r){return r.json();}).then(function(r){
+    if(r.record){var d=r.record;if(d.workouts)workouts=d.workouts;if(d.cardios)cardios=d.cardios;if(d.bodies)bodies=d.bodies;if(d.nutMeals)nutMeals=d.nutMeals;if(d.myInfo)myInfo=d.myInfo;if(d.savedFoods)savedFoods=d.savedFoods;}
+    renderWorkouts();renderCardio();renderBody();renderBodyInfo();renderNutToday();
+    patchViewMode();
+  }).catch(function(){showToast('⚠️ 데이터 불러오기 실패');});
+}
+
+function toggleWeekDay(i){
+  if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}
+  var weekPlanKey='gymv3_wp';
+  var savedWeekPlan=ld(weekPlanKey,null)||WEEK_PLAN.map(function(d){return{d:d.d,w:d.w};});
+  savedWeekPlan[i].w = !savedWeekPlan[i].w;
+  sv(weekPlanKey, savedWeekPlan);
+  renderNutGoal();
+}
+function patchViewMode(){
+  if(!IS_VIEW) return;
+  // 저장 + 기록공유 버튼 숨기기
+  document.querySelectorAll('button').forEach(function(b){
+    var t=b.textContent.trim();
+    if(t.includes('💾 저장')||t.includes('기록 공유')) b.style.display='none';
+  });
+  // 웨이트/유산소 탭 숨기기
+  document.querySelectorAll('.tab').forEach(function(b){
+    var t=b.textContent.trim();
+    if(t.includes('웨이트')||t.includes('유산소')) b.style.display='none';
+  });
+  // 캘린더 탭으로 시작
+  document.querySelectorAll('.tab').forEach(function(b){b.classList.remove('on');});
+  document.querySelectorAll('.tab').forEach(function(b){
+    if(b.textContent.includes('캘린더')) b.classList.add('on');
+  });
+  ['tab-w','tab-c','tab-n','tab-k','tab-b'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) el.style.display='none';
+  });
+  var tk=document.getElementById('tab-k');
+  if(tk) tk.style.display='';
+  // 상단 저장 버튼 숨기기
+  document.querySelectorAll('button').forEach(function(b){
+    if(b.textContent.trim()==='💾 저장') b.style.display='none';
+  });
+  // 웨이트/유산소 탭 숨기기
+  var tabs = document.querySelectorAll('.tab');
+  // 탭 순서: 웨이트(0) 유산소(1) 영양(2) 캘린더(3) 체성분(4)
+  // 보기모드: 캘린더 영양 체성분만 표시
+  tabs[0].style.display='none'; // 웨이트
+  tabs[1].style.display='none'; // 유산소
+  // 캘린더 탭으로 시작
+  tabs.forEach(function(b){b.classList.remove('on');});
+  tabs[3].classList.add('on');
+  ['tab-w','tab-c','tab-n','tab-k','tab-b'].forEach(function(id){
+    document.getElementById(id).style.display='none';
+  });
+  document.getElementById('tab-k').style.display='';
+  // 입력 폼 카드 전체 숨기기 (bsave 버튼 있는 카드)
+  document.querySelectorAll('.card').forEach(function(c){
+    if(c.querySelector('.bsave') || c.querySelector('.badd')) c.style.display='none';
+  });
+  // 삭제 버튼 숨기기
+  document.querySelectorAll('.bdels,.bdel').forEach(function(b){b.style.display='none';});
+  // 내 정보 수정 버튼 숨기기
+  var editBtn=document.getElementById('edit-btn');
+  if(editBtn) editBtn.style.display='none';
+  // 영양 서브탭에서 식사추가/저장음식 탭 숨기기
+  document.querySelectorAll('.stab').forEach(function(b,i){
+    if(b.textContent.indexOf('식사')!==-1||b.textContent.indexOf('저장')!==-1) b.style.display='none';
+  });
+}
+function shareData(){
+  serverSave();
+  var url=window.location.origin+window.location.pathname+'?share='+BIN_ID;
+  if(navigator.share){navigator.share({title:'내 헬스 기록',text:'운동 기록을 확인해보세요! 💪',url:url}).catch(function(){});}
+  else if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){showToast('링크 복사 완료! 카톡에 붙여넣기 하세요 📋');});}
+  else prompt('아래 링크를 복사하세요:',url);
+}
+
+// ══ 초기화
+document.getElementById('nut-date-label').textContent=fmtDate(nutDate);
+addSetRow();addSetRow();
+initViewMode();
+renderWorkouts();renderCardio();renderCalendar();patchViewMode();
+
+</script>
+</body>
+</html>
