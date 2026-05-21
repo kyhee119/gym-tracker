@@ -1092,6 +1092,18 @@ function setDaySetting(key, val){
   daySettings[dk][key]=val;
   sv('gymv3_ds',daySettings);
 }
+
+function getBodyAtDate(dateStr){
+  if(!bodies.length) return null;
+  var sorted=bodies.slice().sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+  var best=sorted[0];
+  for(var i=0;i<sorted.length;i++){
+    if(sorted[i].date<=dateStr) best=sorted[i];
+    else break;
+  }
+  return best;
+}
+
 function calcNutGoals(){
   var curDayMode = getDaySetting('mode', nutMode);
   var curDayWorkout = getDaySetting('workout', nutWorkout);
@@ -1422,7 +1434,7 @@ function renderBody(){
     return '<div class="brow"><div class="brow-top"><span class="bdate">'+l.date+'</span>'+(IS_VIEW?'':'<button class="bdels" onclick="delB('+l.id+')">✕</button>')+'</div><div class="s4"><div><div class="sl">체중</div><div class="sv">'+l.bw+'<sub>kg</sub></div>'+(prev?dH(l.bw,prev.bw,false):'')+'</div><div><div class="sl">근육량</div><div class="sv'+(l.muscle?'':' dash')+'" style="'+(l.muscle?'color:var(--blue);':'')+'">'+( l.muscle?l.muscle+'<sub>kg</sub>':'–')+'</div>'+(prev&&l.muscle&&prev.muscle?dH(l.muscle,prev.muscle,true):'')+'</div><div><div class="sl">체지방</div><div class="sv'+(l.fat?'':' dash')+'">'+(l.fat?l.fat+'<sub>kg</sub>':'–')+'</div></div><div><div class="sl">체지방률</div><div class="sv '+fC(l.fat,l.bw)+'">'+(fr?fr+'%':'–')+'</div></div></div></div>';
   }).join('');
   var sum='';
-  if(s.length>=2){var f=s[0],last=s[s.length-1];function chg(lbl,val,unit,inv){var n=parseFloat(val),pos=n>0,good=inv?!pos:pos;var cls=pos?(good?'pg':'pb'):(good?'ng':'nb');return '<div class="si"><span class="lb">'+lbl+' </span><span class="'+cls+'">'+(pos?'+':'')+n.toFixed(1)+unit+'</span></div>';}sum='<div class="sbar"><div class="slbl">전체 변화 · '+f.date+' → '+last.date+'</div><div class="sitems">'+chg('체중',last.bw-f.bw,'kg',true)+(f.muscle&&last.muscle?chg('근육량',last.muscle-f.muscle,'kg',false):'')+(f.fat&&last.fat?chg('체지방',last.fat-f.fat,'kg',true):'')+(f.fat&&last.fat?chg('체지방률',parseFloat(fatRate(last.fat,last.bw))-parseFloat(fatRate(f.fat,f.bw)),'%',true):'')+'</div></div>';}
+  if(s.length>=2){var f=s[0],last=s[s.length-1];sum='<div class="sbar"><div class="slbl">전체 변화 · '+f.date+' → '+last.date+'</div><div class="sitems">'+chg('체중',last.bw-f.bw,'kg',true)+(f.muscle&&last.muscle?chg('근육량',last.muscle-f.muscle,'kg',false):'')+(f.fat&&last.fat?chg('체지방',last.fat-f.fat,'kg',true):'')+(f.fat&&last.fat?chg('체지방률',parseFloat(fatRate(last.fat,last.bw))-parseFloat(fatRate(f.fat,f.bw)),'%',true):'')+'</div></div>';}
   el.innerHTML='<div class="bwrap"><div class="bhd">체성분 기록</div>'+rows+sum+'</div>';
 }
 
@@ -1473,6 +1485,7 @@ function initViewMode(){
     document.getElementById('share-btn').style.display='';
     // 로컬 데이터 먼저 즉시 렌더링
     renderWorkouts();renderCardio();renderBody();renderBodyInfo();renderNutToday();
+    renderCalendar();renderNutGoal();patchViewMode();
     // 백그라운드로 서버 동기화
     serverLoad(function(data){
       var changed=false;
@@ -1484,7 +1497,9 @@ function initViewMode(){
       if(data.savedFoods&&JSON.stringify(data.savedFoods)!==JSON.stringify(savedFoods)){savedFoods=data.savedFoods;sv(FK,savedFoods);changed=true;}
       if(data.dailyNotes&&Object.keys(data.dailyNotes||{}).length>0){dailyNotes=data.dailyNotes;localStorage.setItem('gymv3_notes',JSON.stringify(dailyNotes));changed=true;}
       if(data.monthlyGoals&&Object.keys(data.monthlyGoals||{}).length>0){monthlyGoals=data.monthlyGoals;localStorage.setItem('gymv3_goals',JSON.stringify(monthlyGoals));changed=true;}
-      if(changed){renderWorkouts();renderCardio();renderBody();renderBodyInfo();renderNutToday();showToast('☁️ 최신 데이터로 업데이트됐어요!');}
+      renderWorkouts();renderCardio();renderBody();renderBodyInfo();renderNutToday();
+      renderCalendar();renderNutGoal();patchViewMode();
+      if(changed)showToast('☁️ 서버에서 업데이트됐어요!');
     });
     return;
   }
@@ -1803,6 +1818,7 @@ function quickAnalysis(msg){document.getElementById('ai-input').value=msg;sendAi
 // ══ 초기화
 document.getElementById('nut-date-label').textContent=fmtDate(nutDate);
 addSetRow();addSetRow();
+switchTab('w');
 initViewMode();
 
 </script>
