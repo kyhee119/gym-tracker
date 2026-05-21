@@ -917,8 +917,20 @@ function switchTab(t){
   if(tab) tab.style.display='block';
   if(t==='k'){renderCalendar();}
   if(t==='n'){document.getElementById('nut-date-label').textContent=fmtDate(nutDate);renderNutToday();}
-  if(t==='b'){renderBodyInfo();renderBody();}
-  if(t==='ai'){renderAiChat();setTimeout(function(){var el=document.getElementById('ai-chat-list');if(el)el.scrollTop=el.scrollHeight;},100);}
+  if(t==='b'){
+    try{renderBodyInfo();renderBody();}
+    catch(e){
+      var el=document.getElementById('tab-b');
+      if(el)el.innerHTML='<div style="padding:20px;color:red;font-size:14px;word-break:break-all;">체성분 에러: '+e.message+'<br>'+e.stack+'</div>';
+    }
+  }
+  if(t==='ai'){
+    try{renderAiChat();}
+    catch(e){
+      var el=document.getElementById('tab-ai');
+      if(el)el.innerHTML='<div style="padding:20px;color:red;font-size:14px;word-break:break-all;">AI코치 에러: '+e.message+'<br>'+e.stack+'</div>';
+    }
+  }
 }
 
 // ══ 웨이트
