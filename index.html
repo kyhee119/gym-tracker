@@ -923,7 +923,7 @@ function switchTab(t){
       renderBodyInfo();
       renderBody();
     } catch(e){
-      document.getElementById('tab-b').innerHTML='<div style="padding:20px;color:#ff4d6d;font-size:13px;word-break:break-all;background:#1a0000;border-radius:8px;margin:10px;"><strong>에러:</strong><br>'+e.message+'<br><br>'+e.stack.split('\n').slice(0,5).join('<br>')+'</div>';
+      alert('체성분 에러:\n'+e.message+'\n\n'+e.stack.slice(0,200));
     }
   }
   var aiEl=document.getElementById('tab-ai');if(aiEl)aiEl.style.display='none';
@@ -932,7 +932,7 @@ function switchTab(t){
     try{
       renderAiChat();
     } catch(e){
-      document.getElementById('tab-ai').innerHTML='<div style="padding:20px;color:#ff4d6d;font-size:13px;word-break:break-all;background:#1a0000;border-radius:8px;margin:10px;"><strong>AI에러:</strong><br>'+e.message+'<br><br>'+e.stack.split('\n').slice(0,5).join('<br>')+'</div>';
+      alert('AI코치 에러:\n'+e.message+'\n\n'+e.stack.slice(0,200));
     }
   }
 }
