@@ -368,7 +368,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
   </div>
 </div>
 <div id="view-banner" class="view-banner" style="display:none">👀 보기 전용 모드</div>
-<div class="tabs" style="display:none;padding:0 13px;">
+<div class="tabs" style="padding:0 13px;">
   <button class="tab on" onclick="switchTab('w')">🏋️ 웨이트</button>
   <button class="tab" onclick="switchTab('c')">🏃 유산소</button>
   <button class="tab" onclick="switchTab('n')">🥗 영양</button>
@@ -909,7 +909,7 @@ function fmtDate(d){var t=dateKey(d)===dateKey(today);var m=d.getMonth()+1,dd=d.
 // ══ 탭
 function switchTab(t){
   ['w','c','n','k','b','ai'].forEach(function(id){var el=document.getElementById('tab-'+id);if(el)el.style.display='none';});
-  var _tab=document.getElementById('tab-'+t);if(_tab)_tab.style.display='';
+  var _tab=document.getElementById('tab-'+t);if(_tab)_tab.style.display='block';
   document.querySelectorAll('.tab').forEach(function(b,i){b.classList.toggle('on',['w','c','n','k','b'][i]===t);});
   if(t==='k') renderCalendar();
   if(t==='n'){document.getElementById('nut-date-label').textContent=fmtDate(nutDate);renderNutToday();}
@@ -1515,7 +1515,7 @@ function shareData(){
 // ── 햄버거 메뉴
 function openMenu(){document.getElementById('side-menu').classList.add('open');document.getElementById('overlay-menu').classList.add('open');}
 function closeMenu(){document.getElementById('side-menu').classList.remove('open');document.getElementById('overlay-menu').classList.remove('open');}
-function switchTabMenu(t,el){switchTab(t);document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('on');});if(el)el.classList.add('on');closeMenu();}
+function switchTabMenu(t,el){closeMenu();document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('on');});if(el)el.classList.add('on');switchTab(t);}
 
 
 
