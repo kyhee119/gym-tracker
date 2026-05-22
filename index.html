@@ -1487,8 +1487,8 @@ function patchViewMode(){
     document.getElementById(id).style.display='none';
   });
   document.getElementById('tab-k').style.display='';
-  // 입력 폼 카드 전체 숨기기 (bsave 버튼 있는 카드)
-  document.querySelectorAll('.card').forEach(function(c){
+  // 입력 폼 카드 숨기기 (웨이트/유산소/영양 탭만, 체성분/AI 제외)
+  document.querySelectorAll('#tab-w .card, #tab-c .card, #tab-n .card').forEach(function(c){
     if(c.querySelector('.bsave') || c.querySelector('.badd')) c.style.display='none';
   });
   // 삭제 버튼 숨기기
