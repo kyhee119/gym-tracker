@@ -913,7 +913,10 @@ function switchTab(t){
   document.querySelectorAll('.tab').forEach(function(b,i){b.classList.toggle('on',['w','c','n','k','b'][i]===t);});
   if(t==='k') renderCalendar();
   if(t==='n'){document.getElementById('nut-date-label').textContent=fmtDate(nutDate);renderNutToday();}
-  if(t==='b'){renderBodyInfo();renderBody();}
+  if(t==='b'){
+    try{renderBodyInfo();}catch(e){alert('renderBodyInfo 에러: '+e.message);}
+    try{renderBody();}catch(e){alert('renderBody 에러: '+e.message);}
+  }
 }
 
 // ══ 웨이트
@@ -1514,16 +1517,16 @@ function shareData(){
 // ── 햄버거 메뉴
 function openMenu(){document.getElementById('side-menu').classList.add('open');document.getElementById('overlay-menu').classList.add('open');}
 function closeMenu(){document.getElementById('side-menu').classList.remove('open');document.getElementById('overlay-menu').classList.remove('open');}
-function switchTabMenu(t,el){switchTab(t);document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('on');});if(el)el.classList.add('on');closeMenu();}
+function switchTabMenu(t,el){try{switchTab(t);}catch(e){}document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('on');});if(el)el.classList.add('on');closeMenu();}
 
-// ── AI탭 처리 (switchTab에 없는 경우 대비)
+// ── AI탭 처리
 var _st=switchTab;
 switchTab=function(t){
-  _st(t);
+  try{_st(t);}catch(e){}
   if(t==='ai'){
     var aiTab=document.getElementById('tab-ai');
     if(aiTab)aiTab.style.display='';
-    renderAiChat();
+    try{renderAiChat();}catch(e){}
   }
 };
 
