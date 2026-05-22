@@ -914,6 +914,7 @@ function switchTab(t){
   if(t==='k') renderCalendar();
   if(t==='n'){document.getElementById('nut-date-label').textContent=fmtDate(nutDate);renderNutToday();}
   if(t==='b'){renderBodyInfo();renderBody();}
+  if(t==='ai'){var _ai=document.getElementById('tab-ai');if(_ai)_ai.style.display='';try{renderAiChat();}catch(e){}}
 }
 
 // ══ 웨이트
@@ -1514,18 +1515,9 @@ function shareData(){
 // ── 햄버거 메뉴
 function openMenu(){document.getElementById('side-menu').classList.add('open');document.getElementById('overlay-menu').classList.add('open');}
 function closeMenu(){document.getElementById('side-menu').classList.remove('open');document.getElementById('overlay-menu').classList.remove('open');}
-function switchTabMenu(t,el){try{switchTab(t);}catch(e){}document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('on');});if(el)el.classList.add('on');closeMenu();}
+function switchTabMenu(t,el){switchTab(t);document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('on');});if(el)el.classList.add('on');closeMenu();}
 
-// ── AI탭 처리
-var _st=switchTab;
-switchTab=function(t){
-  try{_st(t);}catch(e){}
-  if(t==='ai'){
-    var aiTab=document.getElementById('tab-ai');
-    if(aiTab)aiTab.style.display='';
-    try{renderAiChat();}catch(e){}
-  }
-};
+
 
 // ── 이달의 목표
 var monthlyGoals=JSON.parse(localStorage.getItem('gymv3_goals')||'{}');
