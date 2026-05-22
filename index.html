@@ -913,10 +913,7 @@ function switchTab(t){
   document.querySelectorAll('.tab').forEach(function(b,i){b.classList.toggle('on',['w','c','n','k','b'][i]===t);});
   if(t==='k') renderCalendar();
   if(t==='n'){document.getElementById('nut-date-label').textContent=fmtDate(nutDate);renderNutToday();}
-  if(t==='b'){
-    try{renderBodyInfo();}catch(e){alert('renderBodyInfo 에러: '+e.message);}
-    try{renderBody();}catch(e){alert('renderBody 에러: '+e.message);}
-  }
+  if(t==='b'){renderBodyInfo();renderBody();}
 }
 
 // ══ 웨이트
