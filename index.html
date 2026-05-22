@@ -914,7 +914,7 @@ function fmtDate(d){var t=dateKey(d)===dateKey(today);var m=d.getMonth()+1,dd=d.
 // ══ 탭
 function switchTab(t){
   ['w','c','n','k','b'].forEach(function(id){document.getElementById('tab-'+id).style.display='none';});
-  document.getElementById('tab-'+t).style.display='';
+  document.getElementById('tab-'+t).style.cssText='display:block !important';
   document.querySelectorAll('.tab').forEach(function(b,i){b.classList.toggle('on',['w','c','n','k','b'][i]===t);});
   if(t==='k') renderCalendar();
   if(t==='n'){document.getElementById('nut-date-label').textContent=fmtDate(nutDate);renderNutToday();}
