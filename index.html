@@ -1528,10 +1528,10 @@ function shareData(){
 function openMenu(){document.getElementById('side-menu').classList.add('open');document.getElementById('overlay-menu').classList.add('open');}
 function closeMenu(){document.getElementById('side-menu').classList.remove('open');document.getElementById('overlay-menu').classList.remove('open');}
 function switchTabMenu(t,el){
-  switchTab(t);
   document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('on');});
   if(el)el.classList.add('on');
   closeMenu();
+  setTimeout(function(){switchTab(t);},50);
 }
 
 // ── 이달의 목표
