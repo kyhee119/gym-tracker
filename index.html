@@ -919,21 +919,12 @@ function switchTab(t){
   if(t==='k') renderCalendar();
   if(t==='n'){document.getElementById('nut-date-label').textContent=fmtDate(nutDate);renderNutToday();}
   if(t==='b'){
-    try{
-      renderBodyInfo();
-      renderBody();
-    } catch(e){
-      alert('체성분 에러:\n'+e.message+'\n\n'+e.stack.slice(0,200));
-    }
+    renderBodyInfo();renderBody();
   }
   var aiEl=document.getElementById('tab-ai');if(aiEl)aiEl.style.display='none';
   if(t==='ai'){
     var aiTab=document.getElementById('tab-ai');if(aiTab)aiTab.style.display='';
-    try{
-      renderAiChat();
-    } catch(e){
-      alert('AI코치 에러:\n'+e.message+'\n\n'+e.stack.slice(0,200));
-    }
+    renderAiChat();
   }
 }
 
