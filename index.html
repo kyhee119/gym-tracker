@@ -920,9 +920,9 @@ function renderCardio(){
     var tH='<span style="color:#333;font-size:.66rem">2회 이상 필요</span>';
     if(prev){
       var ls,ps;
-      if(t==='treadmill'){ls=last.dist;ps=prev.dist;}
-      else if(t==='stepmill'){ls=last.level*last.duration;ps=prev.level*prev.duration;}
-      else{ls=last.resistance*(last.dist||last.duration);ps=prev.resistance*(prev.dist||prev.duration);}
+      if(t==='treadmill'||t==='incline'){ls=(last.speed||0)*(last.time||last.duration||0);ps=(prev.speed||0)*(prev.time||prev.duration||0);}
+      else if(t==='stepmill'){ls=(last.level||0)*(last.time||last.duration||0);ps=(prev.level||0)*(prev.time||prev.duration||0);}
+      else{ls=(last.resistance||last.level||0)*(last.time||last.duration||0);ps=(prev.resistance||prev.level||0)*(prev.time||prev.duration||0);}
       var p=pct(ls,ps),ok=p>0;
       tH='<div class="ol-wrap"><span class="pill '+(ok?'pill-g':'pill-r')+'">'+(ok?'📈 향상':'📉 감소')+'</span><span class="ol-sub"> <span class="'+(ok?'up':'dn')+'">'+(p>0?'▲':'▼')+Math.abs(p).toFixed(1)+'%</span></span></div>';
     }
