@@ -913,7 +913,7 @@ function switchTab(t){
   document.querySelectorAll('.tab').forEach(function(b,i){b.classList.toggle('on',['w','c','n','k','b'][i]===t);});
   if(t==='k') renderCalendar();
   if(t==='n'){document.getElementById('nut-date-label').textContent=fmtDate(nutDate);renderNutToday();}
-  if(t==='b'){try{renderBodyInfo();}catch(e){alert('renderBodyInfo 에러:'+e.message);}try{renderBody();}catch(e){alert('renderBody 에러:'+e.message);}}
+  if(t==='b'){renderBodyInfo();renderBody();}
   if(t==='ai'){var _ai=document.getElementById('tab-ai');if(_ai)_ai.style.display='';try{renderAiChat();}catch(e){}}
 }
 
@@ -1479,16 +1479,17 @@ function patchViewMode(){
   document.querySelectorAll('button').forEach(function(b){
     if(b.textContent.trim()==='💾 저장') b.style.display='none';
   });
-  // 웨이트/유산소 탭 숨기기
+  // 탭 숨기기
   var tabs = document.querySelectorAll('.tab');
-  // 탭 순서: 웨이트(0) 유산소(1) 영양(2) 캘린더(3) 체성분(4)
-  // 보기모드: 캘린더 영양 체성분만 표시
-  tabs[0].style.display='none'; // 웨이트
-  tabs[1].style.display='none'; // 유산소
-  // 캘린더 탭으로 시작
+  tabs[0].style.display='none';
+  tabs[1].style.display='none';
   tabs.forEach(function(b){b.classList.remove('on');});
-  tabs[3].classList.add('on');
-  ['tab-w','tab-c','tab-n','tab-k','tab-b'].forEach(function(id){
+  if(tabs[3]) tabs[3].classList.add('on');
+  // 사이드메뉴에서 웨이트/유산소 숨기기
+  document.querySelectorAll('.nav-item').forEach(function(n){var t=n.textContent.trim();if(t.includes('웨이트')||t.includes('유산소'))n.style.display='none';});
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('on');});
+  document.querySelectorAll('.nav-item').forEach(function(n){if(n.textContent.includes('캘린더'))n.classList.add('on');});
+  ['tab-w','tab-c','tab-n','tab-k'].forEach(function(id){
     document.getElementById(id).style.display='none';
   });
   document.getElementById('tab-k').style.display='';
