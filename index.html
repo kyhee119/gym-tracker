@@ -1452,10 +1452,19 @@ function quickAnalysis(msg){document.getElementById('ai-input').value=msg;sendAi
 function getLatestBody(dateStr){
   if(!bodies.length) return null;
   var sorted=bodies.slice().sort(function(a,b){return new Date(a.date)-new Date(b.date);});
-  var target=dateStr?new Date(dateStr):new Date();
+  var target;
+  if(dateStr){
+    var p=dateStr.split('-');
+    target=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
+  } else {
+    target=new Date();
+  }
+  target.setHours(23,59,59,999);
   var best=null;
   for(var i=0;i<sorted.length;i++){
-    if(new Date(sorted[i].date)<=target) best=sorted[i];
+    var p2=sorted[i].date.split('-');
+    var bd=new Date(parseInt(p2[0]),parseInt(p2[1])-1,parseInt(p2[2]));
+    if(bd<=target) best=sorted[i];
     else break;
   }
   return best||sorted[0];
