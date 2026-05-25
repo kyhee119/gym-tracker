@@ -389,17 +389,24 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
       <div class="fl full"><label>종류</label>
         <select id="c-type" onchange="onCardioChange()">
           <option value="">선택</option>
-          <option value="treadmill">🏃 런닝머신</option>
+          <option value="treadmill">🏃 런닝머신 (일반)</option>
+          <option value="incline">🏔️ 런닝머신 (인클라인)</option>
           <option value="stepmill">🪜 스텝밀 (천국의계단)</option>
           <option value="cycle">🚴 사이클</option>
         </select>
       </div>
     </div>
     <div id="c-treadmill" style="display:none;margin-top:8px;">
-      <div class="g3">
-        <div class="fl"><label>인클라인 (°)</label><input type="number" id="c-incline" placeholder="0" step="0.5" oninput="cardioPreview()"/></div>
-        <div class="fl"><label>속도 (km/h)</label><input type="number" id="c-speed" placeholder="8.0" step="0.1" oninput="cardioPreview()"/></div>
+      <div class="g2">
+        <div class="fl"><label>속도 (km/h)</label><input type="number" id="c-speed" placeholder="8.0" step="0.5" oninput="cardioPreview()"/></div>
         <div class="fl"><label>시간 (분)</label><input type="number" id="c-time" placeholder="30" oninput="cardioPreview()"/></div>
+      </div>
+    </div>
+    <div id="c-incline-wrap" style="display:none;margin-top:8px;">
+      <div class="g3">
+        <div class="fl"><label>인클라인 (°)</label><input type="number" id="c-incline" placeholder="5" step="0.5" oninput="cardioPreview()"/></div>
+        <div class="fl"><label>속도 (km/h)</label><input type="number" id="c-ispeed" placeholder="5.0" step="0.5" oninput="cardioPreview()"/></div>
+        <div class="fl"><label>시간 (분)</label><input type="number" id="c-itime" placeholder="30" oninput="cardioPreview()"/></div>
       </div>
     </div>
     <div id="c-stepmill" style="display:none;margin-top:8px;">
@@ -688,7 +695,7 @@ var calYear=new Date().getFullYear(),calMonth=new Date().getMonth(),calSelected=
 
 var EX_CAT={'벤치프레스':'chest','인클라인벤치프레스':'chest','디클라인벤치프레스':'chest','덤벨프레스':'chest','인클라인덤벨프레스':'chest','덤벨플라이':'chest','케이블크로스오버':'chest','팩덱플라이':'chest','딥스':'chest','딥스(어시스트)':'chest','푸쉬업':'chest','바벨로우':'back','덤벨로우':'back','랫풀다운':'back','시티드케이블로우':'back','풀업':'back','풀업(어시스트)':'back','친업':'back','친업(어시스트)':'back','페이스풀':'shoulder','시티드로우':'back','데드리프트':'legs','루마니안데드리프트':'legs','스티프레그데드리프트':'legs','덤벨데드리프트':'legs','싱글레그데드리프트':'legs','스쿼트':'legs','프론트스쿼트':'legs','레그프레스':'legs','레그익스텐션':'legs','레그컬':'legs','힙쓰러스트':'legs','런지':'legs','카프레이즈':'legs','이너타이':'legs','아웃타이':'legs','힙어덕션':'legs','힙어브덕션':'legs','숄더프레스':'shoulder','덤벨숄더프레스':'shoulder','사이드레터럴레이즈':'shoulder','프론트레이즈':'shoulder','덤벨리어델트플라이':'shoulder','업라이트로우':'shoulder','비하인드넥프레스':'shoulder','머신리버스플라이':'shoulder','스미스숄더프레스':'shoulder','스미스머신업라이트로우':'shoulder','바벨컬':'arms','덤벨컬':'arms','원암오버헤드익스텐션':'arms','해머컬':'arms','인클라인덤벨컬':'arms','케이블컬':'arms','트라이셉스푸쉬다운':'arms','오버헤드익스텐션':'arms','스컬크러셔':'arms','클로즈그립벤치프레스':'arms','플랭크':'core','크런치':'core','싯업':'core','레그레이즈':'core','행잉레그레이즈':'core','케이블크런치':'core','하이퍼익스텐션':'core',
 '언더그립바벨로우':'back','티바로우':'back','체스트서포티드로우':'back',
-'클로즈그립랫풀다운':'back','덤벨풀오버':'back','케이블풀오버':'back','백익스텐션':'back','리버스하이퍼':'back','스모데드리프트':'back','랙풀':'back','서마리안데드리프트':'back','덤벨풀오버':'back','스트레이트암풀다운':'back','싱글암케이블로우':'back','원암덤벨로우':'back','원암플레이트로우':'back','인버티드로우':'back','머신로우':'back','시티드머신로우':'back','플레이트로디드포웨이로우':'back','굿모닝':'back','케이블풀스루':'back',
+'클로즈그립랫풀다운':'back','덤벨풀오버':'back','케이블풀오버':'back','백익스텐션':'back','리버스하이퍼':'back','스모데드리프트':'back','랙풀':'back','서마리안데드리프트':'back','덤벨풀오버':'back','스트레이트암풀다운':'back','싱글암케이블로우':'back','원암덤벨로우':'back','원암플레이트로우':'back','인버티드로우':'back','하이로우':'back','머신로우':'back','시티드머신로우':'back','플레이트로디드포웨이로우':'back','굿모닝':'back','케이블풀스루':'back',
 '스미스벤치프레스':'chest','스미스인클라인벤치프레스':'chest','덤벨풀오버':'chest','케이블플라이':'chest','체스트프레스머신':'chest','디클라인덤벨프레스':'chest','인클라인덤벨플라이':'chest',
 '스미스스쿼트':'legs','핵스쿼트':'legs','45도레그프레스':'legs','라잉레그컬':'legs','시티드레그컬':'legs',
 '스미스힙쓰러스트':'legs','워킹런지':'legs','리버스런지':'legs','스텝업':'legs','불가리안스플릿스쿼트':'legs','고블릿스쿼트':'legs',
@@ -719,7 +726,7 @@ function manualSave(){
 // ── 종목 검색
 var EX_LIST = {
   '가슴': ['벤치프레스','인클라인벤치프레스','디클라인벤치프레스','덤벨프레스','인클라인덤벨프레스','디클라인덤벨프레스','덤벨플라이','인클라인덤벨플라이','케이블크로스오버','케이블플라이','팩덱플라이','체스트프레스머신','스미스벤치프레스','스미스인클라인벤치프레스','덤벨풀오버','딥스','딥스(어시스트)','푸쉬업'],
-  '등': ['바벨로우','언더그립바벨로우','티바로우','덤벨로우','원암덤벨로우','원암플레이트로우','체스트서포티드로우','랫풀다운','클로즈그립랫풀다운','시티드케이블로우','덤벨풀오버','케이블풀오버','스트레이트암풀다운','싱글암케이블로우','풀업','풀업(어시스트)','친업','친업(어시스트)','인버티드로우','머신로우','시티드머신로우','플레이트로디드포웨이로우','백익스텐션','하이퍼익스텐션','리버스하이퍼','랙풀','굿모닝','케이블풀스루'],
+  '등': ['바벨로우','언더그립바벨로우','티바로우','덤벨로우','원암덤벨로우','원암플레이트로우','체스트서포티드로우','랫풀다운','클로즈그립랫풀다운','시티드케이블로우','덤벨풀오버','케이블풀오버','스트레이트암풀다운','싱글암케이블로우','풀업','풀업(어시스트)','친업','친업(어시스트)','인버티드로우','하이로우','머신로우','시티드머신로우','플레이트로디드포웨이로우','백익스텐션','하이퍼익스텐션','리버스하이퍼','랙풀','굿모닝','케이블풀스루'],
   '하체': ['데드리프트','루마니안데드리프트','스티프레그데드리프트','덤벨데드리프트','싱글레그데드리프트','스모데드리프트','서마리안데드리프트','스쿼트','프론트스쿼트','스미스스쿼트','핵스쿼트','레그프레스','45도레그프레스','레그익스텐션','레그컬','라잉레그컬','시티드레그컬','힙쓰러스트','스미스힙쓰러스트','런지','워킹런지','리버스런지','스텝업','불가리안스플릿스쿼트','고블릿스쿼트','이너타이','아웃타이','힙어덕션','힙어브덕션','힙어브덕션머신','카프레이즈','시티드카프레이즈','글루트킥백'],
   '어깨': ['숄더프레스','덤벨숄더프레스','아놀드프레스','비하인드넥프레스','스미스숄더프레스','플레이트숄더프레스','플레이트로디드숄더프레스','사이드레터럴레이즈','케이블레터럴레이즈','머신레터럴레이즈','프론트레이즈','케이블프론트레이즈','바벨프론트레이즈','플레이트프론트레이즈','덤벨리어델트플라이','머신리버스플라이','케이블리어델트플라이','인클라인리어델트플라이','벤트오버레터럴레이즈','페이스풀','업라이트로우','스미스머신업라이트로우','바벨쉬러그','덤벨쉬러그','숄더프레스머신'],
   '팔': ['바벨컬','덤벨컬','해머컬','인클라인덤벨컬','컨센트레이션컬','케이블컬','케이블해머컬','프리처컬','EZ바컬','원암오버헤드익스텐션','트라이셉스푸쉬다운','로프푸쉬다운','오버헤드익스텐션','케이블오버헤드익스텐션','스컬크러셔','클로즈그립벤치프레스','덤벨킥백'],
@@ -889,12 +896,7 @@ function onCardioChange(){
   if(t) document.getElementById('c-'+t).style.display='';
   document.getElementById('c-preview').style.display='none';
 }
-function cardioPreview(){
-  var t=document.getElementById('c-type').value,box=document.getElementById('c-preview');
-  if(t==='treadmill'){var inc=parseFloat(document.getElementById('c-incline').value)||0,spd=parseFloat(document.getElementById('c-speed').value)||0,min=parseFloat(document.getElementById('c-time').value)||0;if(spd&&min){box.style.display='';box.innerHTML='예상 거리: <strong style="color:var(--green)">'+(spd/60*min).toFixed(2)+'km</strong>'+(inc?' · 인클라인 '+inc+'°':'');}else box.style.display='none';}
-  else if(t==='stepmill'){var lv=parseInt(document.getElementById('c-level').value)||0,min=parseFloat(document.getElementById('c-stime').value)||0;if(lv&&min){box.style.display='';box.innerHTML='강도 <strong style="color:var(--orange)">'+lv+'</strong> · <strong style="color:var(--green)">'+min+'분</strong>';}else box.style.display='none';}
-  else if(t==='cycle'){var res=parseInt(document.getElementById('c-resistance').value)||0,min=parseFloat(document.getElementById('c-ctime').value)||0,dist=parseFloat(document.getElementById('c-cdist').value)||0;if(res&&min){box.style.display='';box.innerHTML='저항 <strong style="color:var(--orange)">Lv.'+res+'</strong> · <strong style="color:var(--green)">'+min+'분</strong>'+(dist?' · '+dist+'km':'');}else box.style.display='none';}
-}
+function cardioPreview(){var t=document.getElementById('c-type').value,el=document.getElementById('c-preview');if(!el)return;if(t==='treadmill'){var s=parseFloat(document.getElementById('c-speed').value)||0,tm=parseFloat(document.getElementById('c-time').value)||0;if(s&&tm){el.style.display='';el.textContent='예상 거리: '+(Math.round(s*tm/60*10)/10)+'km';}else el.style.display='none';}else if(t==='incline'){var inc=parseFloat(document.getElementById('c-incline').value)||0,sp=parseFloat(document.getElementById('c-ispeed').value)||0,ti=parseFloat(document.getElementById('c-itime').value)||0;if(sp&&ti){el.style.display='';el.textContent='경사 '+inc+'° · 예상 거리: '+(Math.round(sp*ti/60*10)/10)+'km';}else el.style.display='none';}else el.style.display='none';}
 function saveCardio(){
   if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}
   var date=document.getElementById('c-date').value,type=document.getElementById('c-type').value,err=document.getElementById('c-err');
