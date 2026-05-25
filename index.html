@@ -1174,7 +1174,7 @@ function renderDayDetail(dateStr){
   });
   cs.forEach(function(c){
     var typeLabel=c.type==='treadmill'?'🏃 런닝머신':c.type==='stepmill'?'🪜 스텝밀':'🚴 사이클';
-    var detail=c.type==='treadmill'?'인클라인 '+c.incline+'° · 속도 '+c.speed+'km/h · '+c.duration+'분'+(c.dist?' · '+c.dist+'km':''):c.type==='stepmill'?'강도 Lv.'+c.level+' · '+c.duration+'분':'저항 Lv.'+c.resistance+' · '+c.duration+'분'+(c.dist?' · '+c.dist+'km':'');
+    var _t=c.time||c.duration||0;var detail=c.type==='treadmill'?'속도 '+(c.speed||0)+'km/h · '+_t+'분':c.type==='incline'?'인클라인 '+(c.incline||0)+'° · 속도 '+(c.speed||0)+'km/h · '+_t+'분':c.type==='stepmill'?'강도 Lv.'+(c.level||0)+' · '+_t+'분':'저항 Lv.'+(c.resistance||c.level||0)+' · '+_t+'분';
     items+='<div class="workout-item"><div class="wi-header"><div class="wi-cat cat-cardio"></div><span class="wi-name">'+typeLabel+'</span><span style="font-size:.65rem;color:var(--sub);margin-left:auto;">유산소</span></div><div class="wi-sets"><div class="wi-set"><span>'+detail+'</span></div></div></div>';
   });
   el.innerHTML='<div class="day-detail"><div class="day-detail-hd"><span>운동 기록</span><span style="font-size:.72rem;color:var(--sub);">'+dateLabel+'</span></div>'+items+'</div>';
