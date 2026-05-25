@@ -332,6 +332,16 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 .nav-icon{font-size:1.1rem;width:24px;text-align:center;}
 .side-footer{padding:16px 20px;border-top:1px solid var(--border);}
 .menu-btn{background:none;border:none;color:var(--text);font-size:1.3rem;cursor:pointer;padding:4px 8px;line-height:1;}
+
+.cat-tabs{display:flex;gap:5px;overflow-x:auto;padding-bottom:4px;margin-bottom:8px;scrollbar-width:none;}
+.cat-tabs::-webkit-scrollbar{display:none;}
+.cat-tab{flex-shrink:0;padding:6px 13px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--sub);font-size:.75rem;cursor:pointer;white-space:nowrap;}
+.cat-tab.on{background:rgba(0,255,157,.1);border-color:var(--green);color:var(--green);font-weight:700;}
+.memo-wrap{margin-top:8px;margin-bottom:8px;}
+.memo-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;}
+.memo-tag{padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--sub);font-size:.73rem;cursor:pointer;}
+.memo-tag.on{background:rgba(56,189,248,.1);border-color:var(--blue);color:var(--blue);}
+.memo-input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:8px 11px;font-size:.84rem;outline:none;}
 </style>
 </head>
 <body>
@@ -382,6 +392,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
         <div class="ex-search-dropdown" id="ex-search-dropdown"></div>
       </div>
       <div class="ex-search-selected" id="ex-search-selected" style="display:none;"></div>
+      <div class="memo-wrap" id="memo-wrap" style="display:none;"><label style="color:var(--sub);font-size:.62rem;text-transform:uppercase;display:block;margin-bottom:4px;">메모 (그립/변형)</label><div class="memo-tags" id="memo-tags"></div><input class="memo-input" id="memo-input" type="text" placeholder="직접 입력..."/></div>
       </div>
     </div>
     <div id="ex-notice" style="display:none;"></div>
@@ -408,6 +419,15 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
       </div>
     </div>
   </div>
+  <div class="cat-tabs" id="w-cat-tabs">
+    <div class="cat-tab on" onclick="selectWCat('all',this)">전체</div>
+    <div class="cat-tab" onclick="selectWCat('chest',this)">🫁 가슴</div>
+    <div class="cat-tab" onclick="selectWCat('back',this)">🔙 등</div>
+    <div class="cat-tab" onclick="selectWCat('legs',this)">🦵 하체</div>
+    <div class="cat-tab" onclick="selectWCat('shoulder',this)">💪 어깨</div>
+    <div class="cat-tab" onclick="selectWCat('arms',this)">💪 팔</div>
+    <div class="cat-tab" onclick="selectWCat('core',this)">🏋️ 복근</div>
+  </div>
   <div id="w-list"></div>
 </div>
 
@@ -420,17 +440,24 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
       <div class="fl full"><label>종류</label>
         <select id="c-type" onchange="onCardioChange()">
           <option value="">선택</option>
-          <option value="treadmill">🏃 런닝머신</option>
+          <option value="treadmill">🏃 런닝머신 (일반)</option>
+          <option value="incline">🏔️ 런닝머신 (인클라인)</option>
           <option value="stepmill">🪜 스텝밀 (천국의계단)</option>
           <option value="cycle">🚴 사이클</option>
         </select>
       </div>
     </div>
     <div id="c-treadmill" style="display:none;margin-top:8px;">
-      <div class="g3">
-        <div class="fl"><label>인클라인 (°)</label><input type="number" id="c-incline" placeholder="0" step="0.5" oninput="cardioPreview()"/></div>
-        <div class="fl"><label>속도 (km/h)</label><input type="number" id="c-speed" placeholder="8.0" step="0.1" oninput="cardioPreview()"/></div>
+      <div class="g2">
+        <div class="fl"><label>속도 (km/h)</label><input type="number" id="c-speed" placeholder="8.0" step="0.5" oninput="cardioPreview()"/></div>
         <div class="fl"><label>시간 (분)</label><input type="number" id="c-time" placeholder="30" oninput="cardioPreview()"/></div>
+      </div>
+    </div>
+    <div id="c-incline-wrap" style="display:none;margin-top:8px;">
+      <div class="g3">
+        <div class="fl"><label>인클라인 (°)</label><input type="number" id="c-incline" placeholder="5" step="0.5" oninput="cardioPreview()"/></div>
+        <div class="fl"><label>속도 (km/h)</label><input type="number" id="c-ispeed" placeholder="5.0" step="0.5" oninput="cardioPreview()"/></div>
+        <div class="fl"><label>시간 (분)</label><input type="number" id="c-itime" placeholder="30" oninput="cardioPreview()"/></div>
       </div>
     </div>
     <div id="c-stepmill" style="display:none;margin-top:8px;">
@@ -514,6 +541,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
   <div id="nut-add" style="display:none">
     <div class="card">
       <div class="chd">저장된 음식에서 추가</div>
+      <div id="nut-add-date-label" style="font-size:.75rem;color:var(--green);font-weight:700;background:rgba(0,255,157,.08);border:1px solid rgba(0,255,157,.2);border-radius:6px;padding:3px 9px;margin-bottom:8px;">오늘 식사 기록</div>
       <div class="g2">
         <div class="fl full"><label>저장된 음식</label><select id="saved-select" onchange="onSavedSelect()"><option value="">직접 입력</option></select></div>
         <div class="fl full"><label>섭취량 (g)</label><input type="number" id="intake-gram" placeholder="140" oninput="calcFromGram()"/></div>
@@ -558,6 +586,17 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 
 <!-- ═══ 캘린더 탭 ═══ -->
 <div id="tab-k" style="display:none">
+  <div class="card" id="monthly-goal-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div style="font-size:.68rem;color:var(--yellow);font-weight:700;">🎯 이달의 목표</div>
+      <button onclick="toggleGoalEdit()" id="goal-edit-btn" style="font-size:.65rem;color:var(--sub);background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 8px;cursor:pointer;">작성</button>
+    </div>
+    <div id="goal-view" style="font-size:.82rem;line-height:1.7;color:var(--sub);white-space:pre-wrap;">이번달 목표를 설정해보세요 🎯</div>
+    <div id="goal-edit" style="display:none;">
+      <textarea id="goal-textarea" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px;font-size:.82rem;outline:none;resize:none;font-family:inherit;min-height:80px;"></textarea>
+      <button onclick="saveGoal()" style="width:100%;padding:9px;background:var(--yellow);color:#080808;border:none;border-radius:7px;font-weight:900;font-size:.82rem;cursor:pointer;margin-top:6px;">저장</button>
+    </div>
+  </div>
   <div class="card">
     <div class="cal-nav">
       <button class="cal-nav-btn" onclick="calMove(-1)">‹</button>
@@ -575,9 +614,18 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
       <div class="leg-item"><div class="cat-dot cat-cardio"></div>유산소</div>
     </div>
   </div>
+  <div class="card" id="daily-note-card" style="display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div style="font-size:.68rem;color:var(--blue);font-weight:700;">✏️ 오늘의 한줄 <span id="daily-note-date" style="color:var(--sub);font-weight:400;"></span></div>
+      <button onclick="toggleDailyNoteEdit()" id="daily-note-edit-btn" style="font-size:.65rem;color:var(--sub);background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 8px;cursor:pointer;">작성</button>
+    </div>
+    <div id="daily-note-view" style="font-size:.85rem;line-height:1.7;color:var(--sub);white-space:pre-wrap;min-height:24px;">오늘 운동 어떠셨나요? 한줄로 남겨보세요 😊</div>
+    <div id="daily-note-edit" style="display:none;">
+      <input id="daily-note-input" type="text" maxlength="100" style="width:100%;background:var(--bg);border:1px solid var(--blue);color:var(--text);border-radius:8px;padding:10px;font-size:.85rem;outline:none;font-family:inherit;"/>
+      <button onclick="saveDailyNote()" style="width:100%;padding:9px;background:var(--blue);color:#080808;border:none;border-radius:7px;font-weight:900;font-size:.82rem;cursor:pointer;margin-top:6px;">저장</button>
+    </div>
+  </div>
   <div id="day-detail"></div>
-</div>
-
 <!-- ═══ 체성분 탭 ═══ -->
 <div id="tab-b" style="display:none">
   <!-- ① 내 정보 -->
@@ -742,7 +790,7 @@ var calYear=new Date().getFullYear(),calMonth=new Date().getMonth(),calSelected=
 
 var EX_CAT={'벤치프레스':'chest','인클라인벤치프레스':'chest','디클라인벤치프레스':'chest','덤벨프레스':'chest','인클라인덤벨프레스':'chest','덤벨플라이':'chest','케이블크로스오버':'chest','팩덱플라이':'chest','딥스':'chest','딥스(어시스트)':'chest','푸쉬업':'chest','바벨로우':'back','덤벨로우':'back','랫풀다운':'back','시티드케이블로우':'back','풀업':'back','풀업(어시스트)':'back','친업':'back','친업(어시스트)':'back','페이스풀':'shoulder','시티드로우':'back','데드리프트':'legs','루마니안데드리프트':'legs','스티프레그데드리프트':'legs','덤벨데드리프트':'legs','싱글레그데드리프트':'legs','스쿼트':'legs','프론트스쿼트':'legs','레그프레스':'legs','레그익스텐션':'legs','레그컬':'legs','힙쓰러스트':'legs','런지':'legs','카프레이즈':'legs','이너타이':'legs','아웃타이':'legs','힙어덕션':'legs','힙어브덕션':'legs','숄더프레스':'shoulder','덤벨숄더프레스':'shoulder','사이드레터럴레이즈':'shoulder','프론트레이즈':'shoulder','덤벨리어델트플라이':'shoulder','업라이트로우':'shoulder','비하인드넥프레스':'shoulder','머신리버스플라이':'shoulder','스미스숄더프레스':'shoulder','스미스머신업라이트로우':'shoulder','바벨컬':'arms','덤벨컬':'arms','원암오버헤드익스텐션':'arms','해머컬':'arms','인클라인덤벨컬':'arms','케이블컬':'arms','트라이셉스푸쉬다운':'arms','오버헤드익스텐션':'arms','스컬크러셔':'arms','클로즈그립벤치프레스':'arms','플랭크':'core','크런치':'core','싯업':'core','레그레이즈':'core','행잉레그레이즈':'core','케이블크런치':'core','하이퍼익스텐션':'core',
 '언더그립바벨로우':'back','티바로우':'back','체스트서포티드로우':'back',
-'클로즈그립랫풀다운':'back','덤벨풀오버':'back','케이블풀오버':'back','백익스텐션':'back','리버스하이퍼':'back','스모데드리프트':'back','랙풀':'back','서마리안데드리프트':'back','덤벨풀오버':'back','스트레이트암풀다운':'back','싱글암케이블로우':'back','원암덤벨로우':'back','원암플레이트로우':'back','인버티드로우':'back','머신로우':'back','시티드머신로우':'back','플레이트로디드포웨이로우':'back','굿모닝':'back','케이블풀스루':'back',
+'클로즈그립랫풀다운':'back','덤벨풀오버':'back','케이블풀오버':'back','백익스텐션':'back','리버스하이퍼':'back','스모데드리프트':'back','랙풀':'back','서마리안데드리프트':'back','덤벨풀오버':'back','스트레이트암풀다운':'back','싱글암케이블로우':'back','원암덤벨로우':'back','원암플레이트로우':'back','인버티드로우':'back','하이로우':'back','머신로우':'back','시티드머신로우':'back','플레이트로디드포웨이로우':'back','굿모닝':'back','케이블풀스루':'back',
 '스미스벤치프레스':'chest','스미스인클라인벤치프레스':'chest','덤벨풀오버':'chest','케이블플라이':'chest','체스트프레스머신':'chest','디클라인덤벨프레스':'chest','인클라인덤벨플라이':'chest',
 '스미스스쿼트':'legs','핵스쿼트':'legs','45도레그프레스':'legs','라잉레그컬':'legs','시티드레그컬':'legs',
 '스미스힙쓰러스트':'legs','워킹런지':'legs','리버스런지':'legs','스텝업':'legs','불가리안스플릿스쿼트':'legs','고블릿스쿼트':'legs',
@@ -773,7 +821,7 @@ function manualSave(){
 // ── 종목 검색
 var EX_LIST = {
   '가슴': ['벤치프레스','인클라인벤치프레스','디클라인벤치프레스','덤벨프레스','인클라인덤벨프레스','디클라인덤벨프레스','덤벨플라이','인클라인덤벨플라이','케이블크로스오버','케이블플라이','팩덱플라이','체스트프레스머신','스미스벤치프레스','스미스인클라인벤치프레스','덤벨풀오버','딥스','딥스(어시스트)','푸쉬업'],
-  '등': ['바벨로우','언더그립바벨로우','티바로우','덤벨로우','원암덤벨로우','원암플레이트로우','체스트서포티드로우','랫풀다운','클로즈그립랫풀다운','시티드케이블로우','덤벨풀오버','케이블풀오버','스트레이트암풀다운','싱글암케이블로우','풀업','풀업(어시스트)','친업','친업(어시스트)','인버티드로우','머신로우','시티드머신로우','플레이트로디드포웨이로우','백익스텐션','하이퍼익스텐션','리버스하이퍼','랙풀','굿모닝','케이블풀스루'],
+  '등': ['바벨로우','언더그립바벨로우','티바로우','덤벨로우','원암덤벨로우','원암플레이트로우','체스트서포티드로우','랫풀다운','클로즈그립랫풀다운','시티드케이블로우','덤벨풀오버','케이블풀오버','스트레이트암풀다운','싱글암케이블로우','풀업','풀업(어시스트)','친업','친업(어시스트)','인버티드로우','하이로우','머신로우','시티드머신로우','플레이트로디드포웨이로우','백익스텐션','하이퍼익스텐션','리버스하이퍼','랙풀','굿모닝','케이블풀스루'],
   '하체': ['데드리프트','루마니안데드리프트','스티프레그데드리프트','덤벨데드리프트','싱글레그데드리프트','스모데드리프트','서마리안데드리프트','스쿼트','프론트스쿼트','스미스스쿼트','핵스쿼트','레그프레스','45도레그프레스','레그익스텐션','레그컬','라잉레그컬','시티드레그컬','힙쓰러스트','스미스힙쓰러스트','런지','워킹런지','리버스런지','스텝업','불가리안스플릿스쿼트','고블릿스쿼트','이너타이','아웃타이','힙어덕션','힙어브덕션','힙어브덕션머신','카프레이즈','시티드카프레이즈','글루트킥백'],
   '어깨': ['숄더프레스','덤벨숄더프레스','아놀드프레스','비하인드넥프레스','스미스숄더프레스','플레이트숄더프레스','플레이트로디드숄더프레스','사이드레터럴레이즈','케이블레터럴레이즈','머신레터럴레이즈','프론트레이즈','케이블프론트레이즈','바벨프론트레이즈','플레이트프론트레이즈','덤벨리어델트플라이','머신리버스플라이','케이블리어델트플라이','인클라인리어델트플라이','벤트오버레터럴레이즈','페이스풀','업라이트로우','스미스머신업라이트로우','바벨쉬러그','덤벨쉬러그','숄더프레스머신'],
   '팔': ['바벨컬','덤벨컬','해머컬','인클라인덤벨컬','컨센트레이션컬','케이블컬','케이블해머컬','프리처컬','EZ바컬','원암오버헤드익스텐션','트라이셉스푸쉬다운','로프푸쉬다운','오버헤드익스텐션','케이블오버헤드익스텐션','스컬크러셔','클로즈그립벤치프레스','덤벨킥백'],
@@ -937,18 +985,8 @@ function renderWorkouts(){
 function toggleSess(id){var e=document.getElementById(id);if(e)e.classList.toggle('open');}
 
 // ══ 유산소
-function onCardioChange(){
-  var t=document.getElementById('c-type').value;
-  ['c-treadmill','c-stepmill','c-cycle'].forEach(function(id){document.getElementById(id).style.display='none';});
-  if(t) document.getElementById('c-'+t).style.display='';
-  document.getElementById('c-preview').style.display='none';
-}
-function cardioPreview(){
-  var t=document.getElementById('c-type').value,box=document.getElementById('c-preview');
-  if(t==='treadmill'){var inc=parseFloat(document.getElementById('c-incline').value)||0,spd=parseFloat(document.getElementById('c-speed').value)||0,min=parseFloat(document.getElementById('c-time').value)||0;if(spd&&min){box.style.display='';box.innerHTML='예상 거리: <strong style="color:var(--green)">'+(spd/60*min).toFixed(2)+'km</strong>'+(inc?' · 인클라인 '+inc+'°':'');}else box.style.display='none';}
-  else if(t==='stepmill'){var lv=parseInt(document.getElementById('c-level').value)||0,min=parseFloat(document.getElementById('c-stime').value)||0;if(lv&&min){box.style.display='';box.innerHTML='강도 <strong style="color:var(--orange)">'+lv+'</strong> · <strong style="color:var(--green)">'+min+'분</strong>';}else box.style.display='none';}
-  else if(t==='cycle'){var res=parseInt(document.getElementById('c-resistance').value)||0,min=parseFloat(document.getElementById('c-ctime').value)||0,dist=parseFloat(document.getElementById('c-cdist').value)||0;if(res&&min){box.style.display='';box.innerHTML='저항 <strong style="color:var(--orange)">Lv.'+res+'</strong> · <strong style="color:var(--green)">'+min+'분</strong>'+(dist?' · '+dist+'km':'');}else box.style.display='none';}
-}
+
+
 function saveCardio(){
   if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}
   var date=document.getElementById('c-date').value,type=document.getElementById('c-type').value,err=document.getElementById('c-err');
@@ -1482,6 +1520,100 @@ async function callAI(msg){var messages=aiHistory.filter(function(m){return m.ro
 function addAiMsg(role,content){aiHistory.push({role:role,content:content});localStorage.setItem('gymv3_ai',JSON.stringify(aiHistory));renderAiChat();}
 async function sendAiMsg(){var input=document.getElementById('ai-input'),msg=input.value.trim();if(!msg)return;input.value='';addAiMsg('user',msg);var el=document.getElementById('ai-chat-list');var ld=document.createElement('div');ld.id='ai-loading';ld.innerHTML='<div style="display:flex;gap:8px;align-items:center;"><div style="width:28px;height:28px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;">🐻</div><div style="padding:10px;background:var(--bg3);border-radius:12px;font-size:.82rem;color:var(--sub);">분석 중... ⏳</div></div>';el.appendChild(ld);el.scrollTop=el.scrollHeight;try{var reply=await callAI(msg);var l=document.getElementById('ai-loading');if(l)l.remove();addAiMsg('assistant',reply);}catch(e){var l=document.getElementById('ai-loading');if(l)l.remove();addAiMsg('assistant','죄송해요 😅');}}
 function quickAnalysis(msg){document.getElementById('ai-input').value=msg;sendAiMsg();}
+
+
+// ── 이달의 목표
+var monthlyGoals=JSON.parse(localStorage.getItem('gymv3_goals')||'{}');
+function toggleGoalEdit(){var edit=document.getElementById('goal-edit'),btn=document.getElementById('goal-edit-btn');var ym=calYear+'-'+(calMonth+1);if(edit.style.display==='none'){document.getElementById('goal-textarea').value=monthlyGoals[ym]||'';edit.style.display='';btn.textContent='취소';}else{edit.style.display='none';btn.textContent='수정';}}
+function saveGoal(){var ym=calYear+'-'+(calMonth+1),val=document.getElementById('goal-textarea').value.trim();if(val)monthlyGoals[ym]=val;else delete monthlyGoals[ym];localStorage.setItem('gymv3_goals',JSON.stringify(monthlyGoals));if(!IS_VIEW)serverSave();flash();renderMonthlyGoal();toggleGoalEdit();}
+function renderMonthlyGoal(){var ym=calYear+'-'+(calMonth+1),goal=monthlyGoals[ym]||'';var view=document.getElementById('goal-view'),btn=document.getElementById('goal-edit-btn');if(!view)return;if(goal){view.textContent=goal;view.style.color='var(--text)';btn.textContent='수정';}else{view.textContent='이번달 목표를 설정해보세요 🎯';view.style.color='var(--sub)';btn.textContent='작성';}}
+
+// ── 오늘의 한줄
+var dailyNotes=JSON.parse(localStorage.getItem('gymv3_notes')||'{}');
+var currentNoteDate='';
+function renderDailyNote(dateStr){currentNoteDate=dateStr;var card=document.getElementById('daily-note-card'),view=document.getElementById('daily-note-view'),btn=document.getElementById('daily-note-edit-btn'),dateLabel=document.getElementById('daily-note-date'),input=document.getElementById('daily-note-input'),edit=document.getElementById('daily-note-edit');if(!card)return;card.style.display='';var parts=dateStr.split('-');dateLabel.textContent=parts[1]+'월 '+parts[2]+'일';var note=dailyNotes[dateStr]||'';if(note){view.textContent=note;view.style.color='var(--text)';btn.textContent='수정';}else{view.textContent='오늘 운동 어떠셨나요? 한줄로 남겨보세요 😊';view.style.color='var(--sub)';btn.textContent='작성';}input.value=note;edit.style.display='none';view.style.display='';}
+function toggleDailyNoteEdit(){var edit=document.getElementById('daily-note-edit'),view=document.getElementById('daily-note-view'),btn=document.getElementById('daily-note-edit-btn');if(edit.style.display==='none'){edit.style.display='';view.style.display='none';btn.textContent='취소';document.getElementById('daily-note-input').focus();}else{edit.style.display='none';view.style.display='';btn.textContent=dailyNotes[currentNoteDate]?'수정':'작성';}}
+function saveDailyNote(){var val=document.getElementById('daily-note-input').value.trim();if(val)dailyNotes[currentNoteDate]=val;else delete dailyNotes[currentNoteDate];localStorage.setItem('gymv3_notes',JSON.stringify(dailyNotes));if(!IS_VIEW)serverSave();flash();renderDailyNote(currentNoteDate);renderCalendar();}
+
+// selectDay, renderCalendar 오버라이드
+var _origSelectDay=selectDay;
+selectDay=function(d){_origSelectDay(d);renderDailyNote(d);renderMonthlyGoal();};
+var _origRenderCalendar=renderCalendar;
+renderCalendar=function(){_origRenderCalendar();renderMonthlyGoal();};
+
+// ── 영양 날짜
+function updateNutAddDate(){var el=document.getElementById('nut-add-date-label');if(!el)return;var tod=new Date(),isToday=nutDate.getFullYear()===tod.getFullYear()&&nutDate.getMonth()===tod.getMonth()&&nutDate.getDate()===tod.getDate();el.textContent=(isToday?'오늘':'📅 '+fmtDate(nutDate))+' 식사 기록';}
+var _origChangeNutDay=changeNutDay;changeNutDay=function(dir){_origChangeNutDay(dir);updateNutAddDate();};
+var _origSwitchNut=switchNut;switchNut=function(t,btn){_origSwitchNut(t,btn);if(t==='add')updateNutAddDate();};
+
+// ── 메모 태그
+var MEMO_TAGS={'back':['와이드그립','클로즈그립','언더그립','뉴트럴그립','로프','MAG','와이드MAG'],'shoulder':['와이드그립','클로즈그립','덤벨','케이블','바벨'],'arms':['스탠딩','인클라인','시티드','케이블','해머']};
+function renderMemoTags(cat){var wrap=document.getElementById('memo-wrap'),tagsDiv=document.getElementById('memo-tags');if(!wrap||!tagsDiv)return;var tags=MEMO_TAGS[cat]||[];tagsDiv.innerHTML=tags.map(function(t){return '<div class="memo-tag" onclick="toggleMemoTag(this,\''+t+'\')">'+t+'</div>';}).join('');wrap.style.display='';var inp=document.getElementById('memo-input');if(inp)inp.value='';}
+function toggleMemoTag(el,val){var input=document.getElementById('memo-input');if(el.classList.contains('on')){el.classList.remove('on');if(input)input.value='';}else{document.querySelectorAll('.memo-tag').forEach(function(t){t.classList.remove('on');});el.classList.add('on');if(input)input.value=val;}}
+
+// ── 부위별 탭
+var wCat='all',wOpenCards={};
+function selectWCat(cat,el){wCat=cat;document.querySelectorAll('.cat-tab').forEach(function(t){t.classList.remove('on');});el.classList.add('on');renderWorkouts();}
+function toggleWCard(ex){wOpenCards[ex]=!wOpenCards[ex];renderWorkouts();}
+var _origRW=renderWorkouts;
+renderWorkouts=function(){
+  var el=document.getElementById('w-list');
+  var groups={};
+  workouts.forEach(function(w){if(!groups[w.ex])groups[w.ex]=[];groups[w.ex].push(w);});
+  var keys=Object.keys(groups).filter(function(ex){return wCat==='all'||(EX_CAT[ex]===wCat);});
+  if(!keys.length){el.innerHTML='<div class="empty">💪<br>기록이 없어요</div>';return;}
+  el.onclick=function(e){var hd=e.target.closest('[data-wex]');if(hd)toggleWCard(hd.getAttribute('data-wex'));};
+  el.innerHTML=keys.map(function(ex){
+    var logs=groups[ex].slice().sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+    var last=logs[logs.length-1],prev=logs.length>=2?logs[logs.length-2]:null;
+    var type=last.type||exType(ex);
+    var olHTML='<span style="color:var(--sub);font-size:.66rem;">세션 2회 이상 필요</span>';
+    if(prev){var lV=last.totalVol||0,pV=prev.totalVol||0;if(lV>pV)olHTML='<span style="color:var(--green);font-size:.72rem;font-weight:700;">▲ 과부하</span>';else if(lV<pV)olHTML='<span style="color:var(--red);font-size:.72rem;font-weight:700;">▼ 감소</span>';else olHTML='<span style="color:var(--sub);font-size:.72rem;">➡ 유지</span>';}
+    var isOpen=wOpenCards[ex],catCls=CAT_CLS[EX_CAT[ex]]||'';
+    var histRows=logs.slice().reverse().map(function(w){var setStr=w.sets.map(function(s,si){return 'S'+(si+1)+'&nbsp;'+(s.kg&&type!=='bw'?s.kg+'kg×':'')+s.reps+'회';}).join('&nbsp;&nbsp;');var memoTag=w.memo?'<span style="font-size:.62rem;color:var(--blue);background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);border-radius:20px;padding:1px 6px;margin-left:4px;">'+w.memo+'</span>':'';var vol=w.totalVol?'<span style="color:var(--green);font-size:.7rem;font-weight:700;">'+w.totalVol.toLocaleString()+'kg</span>':'';return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:.76rem;"><div><div style="color:var(--sub);margin-bottom:2px;">'+w.date+memoTag+'</div><div>'+setStr+'</div></div>'+vol+'</div>';}).join('');
+    return '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden;"><div style="padding:11px 13px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;" data-wex="'+ex+'"><div><div style="font-size:.88rem;font-weight:900;display:flex;align-items:center;gap:5px;"><span class="cat-dot '+catCls+'" style="display:inline-block;"></span>'+ex+'</div><div style="font-size:.68rem;color:var(--sub);margin-top:2px;">최근: '+last.date+'&nbsp;&nbsp;세션 '+logs.length+'회</div></div>'+olHTML+'</div>'+(isOpen?'<div style="padding:0 13px 10px;">'+histRows+'</div>':'')+'</div>';
+  }).join('');
+};
+
+// ── 유산소 개선 (인클라인 + undefined분 수정)
+function onCardioChange(){var t=document.getElementById('c-type').value;['c-treadmill','c-incline-wrap','c-stepmill','c-cycle'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='none';});if(t==='treadmill')document.getElementById('c-treadmill').style.display='';else if(t==='incline')document.getElementById('c-incline-wrap').style.display='';else if(t==='stepmill')document.getElementById('c-stepmill').style.display='';else if(t==='cycle')document.getElementById('c-cycle').style.display='';}
+function cardioPreview(){var t=document.getElementById('c-type').value,el=document.getElementById('c-preview');if(!el)return;if(t==='treadmill'){var s=parseFloat(document.getElementById('c-speed').value)||0,tm=parseFloat(document.getElementById('c-time').value)||0;if(s&&tm){el.style.display='';el.textContent='예상 거리: '+(Math.round(s*tm/60*10)/10)+'km';}else el.style.display='none';}else if(t==='incline'){var inc=parseFloat(document.getElementById('c-incline').value)||0,sp=parseFloat(document.getElementById('c-ispeed').value)||0,ti=parseFloat(document.getElementById('c-itime').value)||0;if(sp&&ti){el.style.display='';el.textContent='경사 '+inc+'° · 예상 거리: '+(Math.round(sp*ti/60*10)/10)+'km';}else el.style.display='none';}else el.style.display='none';}
+
+// renderCardio 오버라이드 (undefined분 수정 + 인클라인)
+var _origRC=renderCardio;
+renderCardio=function(){
+  var el=document.getElementById('c-list');
+  if(!cardios.length){el.innerHTML='<div class="empty">🏃<br>유산소 기록이 없어요</div>';return;}
+  var groups={treadmill:[],incline:[],stepmill:[],cycle:[]};
+  cardios.forEach(function(c){if(groups[c.type])groups[c.type].push(c);else groups.treadmill.push(c);});
+  var cardioNames={treadmill:'🏃 런닝머신 (일반)',incline:'🏔️ 런닝머신 (인클라인)',stepmill:'🪜 스텝밀',cycle:'🚴 사이클'};
+  var h='';
+  ['treadmill','incline','stepmill','cycle'].forEach(function(t){
+    if(!groups[t].length)return;
+    var logs=groups[t].slice().sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+    var last=logs[logs.length-1],prev=logs.length>1?logs[logs.length-2]:null;
+    var tH='<span style="color:#333;font-size:.66rem">2회 이상 필요</span>';
+    if(prev){var ls=(last.speed||0)*(last.time||last.duration||0),ps=(prev.speed||0)*(prev.time||prev.duration||0);if(ps>0){var p=pct(ls,ps),ok=p>0;tH='<div class="ol-wrap"><span class="pill '+(ok?'pill-g':'pill-r')+'">'+(ok?'📈 향상':'📉 감소')+'</span></div>';}}
+    var rows=logs.slice().reverse().map(function(c){
+      var time=c.time||c.duration||0;
+      var stats='';
+      if(t==='treadmill')stats='<div class="cst"><span class="cl">속도</span><br><span class="cv hi">'+(c.speed||0)+'km/h</span></div><div class="cst"><span class="cl">시간</span><br><span class="cv">'+time+'분</span></div>';
+      else if(t==='incline')stats='<div class="cst"><span class="cl">인클라인</span><br><span class="cv hi">'+(c.incline||0)+'°</span></div><div class="cst"><span class="cl">속도</span><br><span class="cv">'+(c.speed||0)+'km/h</span></div><div class="cst"><span class="cl">시간</span><br><span class="cv">'+time+'분</span></div>';
+      else if(t==='stepmill')stats='<div class="cst"><span class="cl">강도</span><br><span class="cv hi">Lv.'+(c.level||0)+'</span></div><div class="cst"><span class="cl">시간</span><br><span class="cv">'+time+'분</span></div>';
+      else stats='<div class="cst"><span class="cl">저항</span><br><span class="cv hi">Lv.'+(c.level||c.resistance||0)+'</span></div><div class="cst"><span class="cl">시간</span><br><span class="cv">'+time+'분</span></div>';
+      return '<div class="c-row"><span class="c-date">'+c.date+'</span><div class="c-stats">'+stats+(IS_VIEW?'':'<button class="bdels" onclick="delC('+c.id+')">✕</button>')+'</div></div>';
+    }).join('');
+    h+='<div class="c-card"><div class="c-hd"><span class="c-name">'+cardioNames[t]+'</span>'+tH+'</div>'+rows+'</div>';
+  });
+  el.innerHTML=h;
+};
+
+// serverSave 오버라이드 (notes/goals 포함)
+var _origSS=serverSave;
+serverSave=function(){
+  var data={workouts:workouts,cardios:cardios,bodies:bodies,nutMeals:nutMeals,myInfo:myInfo,savedFoods:savedFoods,dailyNotes:dailyNotes,monthlyGoals:monthlyGoals};
+  fetch(BASE+'/b/'+BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JKEY},body:JSON.stringify(data)}).catch(function(){showToast('⚠️ 서버 저장 실패');});
+};
 
 document.getElementById('nut-date-label').textContent=fmtDate(nutDate);
 addSetRow();addSetRow();
