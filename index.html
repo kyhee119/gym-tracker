@@ -1387,36 +1387,56 @@ function toggleWeekDay(i){
 }
 function patchViewMode(){
   if(!IS_VIEW) return;
-  // 상단 저장 버튼 숨기기
+
+  // 햄버거 메뉴 숨기기
+  var sideMenu=document.getElementById('side-menu');
+  var overlayMenu=document.getElementById('overlay-menu');
+  var menuBtn=document.querySelector('.menu-btn');
+  if(sideMenu) sideMenu.style.display='none';
+  if(overlayMenu) overlayMenu.style.display='none';
+  if(menuBtn) menuBtn.style.display='none';
+
+  // 상단 탭 보이기 + 영양/캘린더/체성분만
+  var tabsDiv=document.querySelector('.tabs');
+  if(tabsDiv) tabsDiv.style.display='';
+  var tabs=document.querySelectorAll('.tab');
+  // 웨이트(0) 유산소(1) 영양(2) 캘린더(3) 체성분(4)
+  if(tabs[0]) tabs[0].style.display='none';
+  if(tabs[1]) tabs[1].style.display='none';
+
+  // 저장 버튼 숨기기
   document.querySelectorAll('button').forEach(function(b){
     if(b.textContent.trim()==='💾 저장') b.style.display='none';
   });
-  // 웨이트/유산소 탭 숨기기
-  var tabs = document.querySelectorAll('.tab');
-  // 탭 순서: 웨이트(0) 유산소(1) 영양(2) 캘린더(3) 체성분(4)
-  // 보기모드: 캘린더 영양 체성분만 표시
-  tabs[0].style.display='none'; // 웨이트
-  tabs[1].style.display='none'; // 유산소
-  // 캘린더 탭으로 시작
-  tabs.forEach(function(b){b.classList.remove('on');});
-  tabs[3].classList.add('on');
-  ['tab-w','tab-c','tab-n','tab-k','tab-b'].forEach(function(id){
-    document.getElementById(id).style.display='none';
+
+  // 기록공유 버튼 숨기기
+  var shareBtn=document.getElementById('share-btn');
+  if(shareBtn) shareBtn.style.display='none';
+
+  // 입력 폼 숨기기 (영양 추가/저장 제외, 체성분 제외)
+  document.querySelectorAll('#tab-n .card').forEach(function(c){
+    if(c.querySelector('.bsave')||c.querySelector('.badd')) c.style.display='none';
   });
-  document.getElementById('tab-k').style.display='';
-  // 입력 폼 카드 전체 숨기기 (bsave 버튼 있는 카드)
-  document.querySelectorAll('.card').forEach(function(c){
-    if(c.querySelector('.bsave') || c.querySelector('.badd')) c.style.display='none';
-  });
+
   // 삭제 버튼 숨기기
   document.querySelectorAll('.bdels,.bdel').forEach(function(b){b.style.display='none';});
+
   // 내 정보 수정 버튼 숨기기
   var editBtn=document.getElementById('edit-btn');
   if(editBtn) editBtn.style.display='none';
-  // 영양 서브탭에서 식사추가/저장음식 탭 숨기기
-  document.querySelectorAll('.stab').forEach(function(b,i){
+
+  // 영양 서브탭에서 식사추가/저장음식 숨기기
+  document.querySelectorAll('.stab').forEach(function(b){
     if(b.textContent.indexOf('식사')!==-1||b.textContent.indexOf('저장')!==-1) b.style.display='none';
   });
+
+  // 캘린더 탭으로 시작
+  ['tab-w','tab-c','tab-n','tab-k','tab-b','tab-ai'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.style.display='none';
+  });
+  var tk=document.getElementById('tab-k');if(tk)tk.style.display='';
+  tabs.forEach(function(b){b.classList.remove('on');});
+  if(tabs[3]) tabs[3].classList.add('on');
 }
 function shareData(){
   serverSave();
