@@ -1360,11 +1360,7 @@ function initViewMode(){
   if(!binId){
     document.getElementById('share-btn').style.display='';
     // 로컬 데이터 먼저 즉시 렌더링
-    try{renderWorkouts();}catch(e){alert('renderWorkouts 에러:'+e.message);}
-    try{renderCardio();}catch(e){alert('renderCardio 에러:'+e.message);}
-    try{renderBody();}catch(e){alert('renderBody 에러:'+e.message);}
-    try{renderBodyInfo();}catch(e){alert('renderBodyInfo 에러:'+e.message);}
-    try{renderNutToday();}catch(e){alert('renderNutToday 에러:'+e.message);}
+    renderWorkouts();renderCardio();renderBody();renderBodyInfo();renderNutToday();
     // 백그라운드로 서버 동기화
     serverLoad(function(data){
       var changed=false;
@@ -1410,13 +1406,13 @@ function patchViewMode(){
   // 캘린더 탭으로 시작
   tabs.forEach(function(b){b.classList.remove('on');});
   tabs[3].classList.add('on');
-  ['tab-w','tab-c','tab-n','tab-k','tab-b'].forEach(function(id){
-    document.getElementById(id).style.display='none';
+  ['tab-w','tab-c','tab-n','tab-k'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.style.display='none';
   });
-  document.getElementById('tab-k').style.display='';
+  var tk=document.getElementById('tab-k');if(tk)tk.style.display='';
   // 입력 폼 카드 전체 숨기기 (bsave 버튼 있는 카드)
-  document.querySelectorAll('.card').forEach(function(c){
-    if(c.querySelector('.bsave') || c.querySelector('.badd')) c.style.display='none';
+  document.querySelectorAll('#tab-w .card,#tab-c .card,#tab-n .card').forEach(function(c){
+    if(c.querySelector('.bsave')||c.querySelector('.badd')) c.style.display='none';
   });
   // 삭제 버튼 숨기기
   document.querySelectorAll('.bdels,.bdel').forEach(function(b){b.style.display='none';});
