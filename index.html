@@ -1360,7 +1360,11 @@ function initViewMode(){
   if(!binId){
     document.getElementById('share-btn').style.display='';
     // 로컬 데이터 먼저 즉시 렌더링
-    renderWorkouts();renderCardio();renderBody();renderBodyInfo();renderNutToday();
+    try{renderWorkouts();}catch(e){alert('renderWorkouts 에러:'+e.message);}
+    try{renderCardio();}catch(e){alert('renderCardio 에러:'+e.message);}
+    try{renderBody();}catch(e){alert('renderBody 에러:'+e.message);}
+    try{renderBodyInfo();}catch(e){alert('renderBodyInfo 에러:'+e.message);}
+    try{renderNutToday();}catch(e){alert('renderNutToday 에러:'+e.message);}
     // 백그라운드로 서버 동기화
     serverLoad(function(data){
       var changed=false;
