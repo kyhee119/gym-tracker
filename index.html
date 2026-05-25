@@ -913,7 +913,7 @@ function switchTab(t){
   document.querySelectorAll('.tab').forEach(function(b,i){b.classList.toggle('on',['w','c','n','k','b'][i]===t);});
   if(t==='k') renderCalendar();
   if(t==='n'){document.getElementById('nut-date-label').textContent=fmtDate(nutDate);renderNutToday();}
-  if(t==='b'){renderBodyInfo();renderBody();var _dbg=document.getElementById('tab-b');alert('tab-b display: '+(_dbg?_dbg.style.display:'없음!'));}
+  if(t==='b'){try{renderBodyInfo();}catch(e){alert('renderBodyInfo 에러:'+e.message);}try{renderBody();}catch(e){alert('renderBody 에러:'+e.message);}}
   if(t==='ai'){var _ai=document.getElementById('tab-ai');if(_ai)_ai.style.display='';try{renderAiChat();}catch(e){}}
 }
 
