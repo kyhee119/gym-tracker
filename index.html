@@ -1342,8 +1342,18 @@ function updDisp(){var m=Math.floor(tLeft/60),s=tLeft%60;document.getElementById
 // ══ 서버 저장 & 공유
 function showToast(msg,dur){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#222;color:#eee;padding:10px 18px;border-radius:20px;font-size:.8rem;z-index:999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.4);';document.body.appendChild(t);setTimeout(function(){t.remove();},dur||2500);}
 function serverSave(){
-  var data={workouts:workouts,cardios:cardios,bodies:bodies,nutMeals:nutMeals,myInfo:myInfo,savedFoods:savedFoods,aiHistory:(typeof aiHistory!=='undefined'?aiHistory.slice(-20):[])};
-  fetch(BASE+'/b/'+BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JKEY},body:JSON.stringify(data)}).catch(function(){showToast('⚠️ 서버 저장 실패');});
+  var data={workouts:workouts,cardios:cardios,bodies:bodies,nutMeals:nutMeals,myInfo:myInfo};
+  var json=JSON.stringify(data);
+  if(json.length>90000){
+    // 너무 크면 nutMeals 최근 30일만
+    var cutoff=new Date();cutoff.setDate(cutoff.getDate()-30);
+    var cutStr=cutoff.getFullYear()+'-'+(cutoff.getMonth()+1)+'-'+cutoff.getDate();
+    var trimMeals={};
+    Object.keys(nutMeals).forEach(function(k){if(k>=cutStr)trimMeals[k]=nutMeals[k];});
+    data.nutMeals=trimMeals;
+    json=JSON.stringify(data);
+  }
+  fetch(BASE+'/b/'+BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JKEY},body:json}).then(function(r){if(!r.ok)showToast('⚠️ 서버 저장 실패('+r.status+')')}).catch(function(){showToast('⚠️ 서버 저장 실패');});
 }
 function serverLoad(cb){
   fetch(BASE+'/b/'+BIN_ID+'/latest',{headers:{'X-Master-Key':JKEY}}).then(function(r){return r.json();}).then(function(r){if(r.record)cb(r.record);}).catch(function(){});
