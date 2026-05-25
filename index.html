@@ -1521,7 +1521,7 @@ function shareData(){
 // ── 햄버거 메뉴
 function openMenu(){document.getElementById('side-menu').classList.add('open');document.getElementById('overlay-menu').classList.add('open');}
 function closeMenu(){document.getElementById('side-menu').classList.remove('open');document.getElementById('overlay-menu').classList.remove('open');}
-function switchTabMenu(t,el){closeMenu();document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('on');});if(el)el.classList.add('on');switchTab(t);}
+function switchTabMenu(t,el){closeMenu();document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('on');});if(el)el.classList.add('on');alert("switchTab 호출:"+t);switchTab(t);alert("tab-b display:"+(document.getElementById("tab-b")?document.getElementById("tab-b").style.display:"없음"));}
 
 
 
