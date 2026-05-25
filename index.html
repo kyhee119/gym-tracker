@@ -704,6 +704,9 @@ var savedFoods=ld(FK,[
 ]);
 
 var IS_VIEW=window.location.search.includes('view=1')||window.location.href.includes('view=1');
+var monthlyGoals=JSON.parse(localStorage.getItem('gymv3_goals')||'{}');
+var dailyNotes=JSON.parse(localStorage.getItem('gymv3_notes')||'{}');
+var currentNoteDate='';
 var BW_EX=['플랭크','크런치','싯업','레그레이즈','행잉레그레이즈','케이블크런치','하이퍼익스텐션','풀업','친업','딥스','푸쉬업','런지'];
 var ASSIST_EX=['딥스(어시스트)','풀업(어시스트)','친업(어시스트)'];
 var NUT_MODES={bulk:{name:'벌크업',color:'#ff9f1c',deficit:300,protMult:1.8},recomp:{name:'린매스',color:'#00ff9d',deficit:-175,protMult:2.0},cut:{name:'컷팅',color:'#ff4d6d',deficit:-350,protMult:2.2},maintain:{name:'유지',color:'#38bdf8',deficit:0,protMult:1.6}};
@@ -1445,11 +1448,9 @@ async function sendAiMsg(){var input=document.getElementById('ai-input'),msg=inp
 function quickAnalysis(msg){document.getElementById('ai-input').value=msg;sendAiMsg();}
 
 
-var monthlyGoals=JSON.parse(localStorage.getItem('gymv3_goals')||'{}');
 function toggleGoalEdit(){var edit=document.getElementById('goal-edit'),btn=document.getElementById('goal-edit-btn');var ym=calYear+'-'+(calMonth+1);if(edit.style.display==='none'){document.getElementById('goal-textarea').value=monthlyGoals[ym]||'';edit.style.display='';btn.textContent='취소';}else{edit.style.display='none';btn.textContent='수정';}}
 function saveGoal(){var ym=calYear+'-'+(calMonth+1),val=document.getElementById('goal-textarea').value.trim();if(val)monthlyGoals[ym]=val;else delete monthlyGoals[ym];localStorage.setItem('gymv3_goals',JSON.stringify(monthlyGoals));if(!IS_VIEW)serverSave();flash();renderMonthlyGoal();toggleGoalEdit();}
 function renderMonthlyGoal(){var ym=calYear+'-'+(calMonth+1),goal=monthlyGoals[ym]||'';var view=document.getElementById('goal-view'),btn=document.getElementById('goal-edit-btn');if(!view)return;if(goal){view.textContent=goal;view.style.color='var(--text)';btn.textContent='수정';}else{view.textContent='이번달 목표를 설정해보세요 🎯';view.style.color='var(--sub)';btn.textContent='작성';}}
-var dailyNotes=JSON.parse(localStorage.getItem('gymv3_notes')||'{}');
 var currentNoteDate='';
 function renderDailyNote(dateStr){currentNoteDate=dateStr;var card=document.getElementById('daily-note-card'),view=document.getElementById('daily-note-view'),btn=document.getElementById('daily-note-edit-btn'),dateLabel=document.getElementById('daily-note-date'),input=document.getElementById('daily-note-input'),edit=document.getElementById('daily-note-edit');if(!card)return;card.style.display='';var parts=dateStr.split('-');dateLabel.textContent=parts[1]+'월 '+parts[2]+'일';var note=dailyNotes[dateStr]||'';if(note){view.textContent=note;view.style.color='var(--text)';btn.textContent='수정';}else{view.textContent='오늘 운동 어떠셨나요? 한줄로 남겨보세요 😊';view.style.color='var(--sub)';btn.textContent='작성';}input.value=note;edit.style.display='none';view.style.display='';}
 function toggleDailyNoteEdit(){var edit=document.getElementById('daily-note-edit'),view=document.getElementById('daily-note-view'),btn=document.getElementById('daily-note-edit-btn');if(edit.style.display==='none'){edit.style.display='';view.style.display='none';btn.textContent='취소';document.getElementById('daily-note-input').focus();}else{edit.style.display='none';view.style.display='';btn.textContent=dailyNotes[currentNoteDate]?'수정':'작성';}}
