@@ -534,6 +534,17 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 
 <!-- ═══ 캘린더 탭 ═══ -->
 <div id="tab-k" style="display:none">
+  <div class="card" id="monthly-goal-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div style="font-size:.68rem;color:var(--yellow);font-weight:700;">🎯 이달의 목표</div>
+      <button onclick="toggleGoalEdit()" id="goal-edit-btn" style="font-size:.65rem;color:var(--sub);background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 8px;cursor:pointer;">작성</button>
+    </div>
+    <div id="goal-view" style="font-size:.82rem;line-height:1.7;color:var(--sub);white-space:pre-wrap;">이번달 목표를 설정해보세요 🎯</div>
+    <div id="goal-edit" style="display:none;">
+      <textarea id="goal-textarea" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px;font-size:.82rem;outline:none;resize:none;font-family:inherit;min-height:80px;"></textarea>
+      <button onclick="saveGoal()" style="width:100%;padding:9px;background:var(--yellow);color:#080808;border:none;border-radius:7px;font-weight:900;font-size:.82rem;cursor:pointer;margin-top:6px;">저장</button>
+    </div>
+  </div>
   <div class="card">
     <div class="cal-nav">
       <button class="cal-nav-btn" onclick="calMove(-1)">‹</button>
@@ -551,9 +562,18 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
       <div class="leg-item"><div class="cat-dot cat-cardio"></div>유산소</div>
     </div>
   </div>
+  <div class="card" id="daily-note-card" style="display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div style="font-size:.68rem;color:var(--blue);font-weight:700;">✏️ 오늘의 한줄 <span id="daily-note-date" style="color:var(--sub);font-weight:400;"></span></div>
+      <button onclick="toggleDailyNoteEdit()" id="daily-note-edit-btn" style="font-size:.65rem;color:var(--sub);background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 8px;cursor:pointer;">작성</button>
+    </div>
+    <div id="daily-note-view" style="font-size:.85rem;line-height:1.7;color:var(--sub);white-space:pre-wrap;min-height:24px;">오늘 운동 어떠셨나요? 한줄로 남겨보세요 😊</div>
+    <div id="daily-note-edit" style="display:none;">
+      <input id="daily-note-input" type="text" maxlength="100" style="width:100%;background:var(--bg);border:1px solid var(--blue);color:var(--text);border-radius:8px;padding:10px;font-size:.85rem;outline:none;font-family:inherit;"/>
+      <button onclick="saveDailyNote()" style="width:100%;padding:9px;background:var(--blue);color:#080808;border:none;border-radius:7px;font-weight:900;font-size:.82rem;cursor:pointer;margin-top:6px;">저장</button>
+    </div>
+  </div>
   <div id="day-detail"></div>
-</div>
-
 <!-- ═══ 체성분 탭 ═══ -->
 <div id="tab-b" style="display:none">
   <!-- ① 내 정보 -->
@@ -1158,9 +1178,14 @@ function renderCalendar(){
   };
   if(calSelected) renderDayDetail(calSelected);
 
+
+  if(typeof renderMonthlyGoal==='function') renderMonthlyGoal();
 }
 
-function selectDay(dateStr){calSelected=dateStr;renderCalendar();renderDayDetail(dateStr);}
+function selectDay(dateStr){calSelected=dateStr;renderCalendar();renderDayDetail(dateStr);
+  if(typeof renderDailyNote==='function') renderDailyNote(dateStr);
+  if(typeof renderMonthlyGoal==='function') renderMonthlyGoal();
+}
 function renderDayDetail(dateStr){
   var el=document.getElementById('day-detail');
   var ws=workouts.filter(function(w){return w.date===dateStr;}),cs=cardios.filter(function(c){return c.date===dateStr;});
@@ -1323,7 +1348,7 @@ function updDisp(){var m=Math.floor(tLeft/60),s=tLeft%60;document.getElementById
 // ══ 서버 저장 & 공유
 function showToast(msg,dur){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#222;color:#eee;padding:10px 18px;border-radius:20px;font-size:.8rem;z-index:999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.4);';document.body.appendChild(t);setTimeout(function(){t.remove();},dur||2500);}
 function serverSave(){
-  var data={workouts:workouts,cardios:cardios,bodies:bodies,nutMeals:nutMeals,myInfo:myInfo,savedFoods:savedFoods};
+  var data={workouts:workouts,cardios:cardios,bodies:bodies,nutMeals:nutMeals,myInfo:myInfo,savedFoods:savedFoods,dailyNotes:(typeof dailyNotes!=='undefined'?dailyNotes:{}),monthlyGoals:(typeof monthlyGoals!=='undefined'?monthlyGoals:{})};
   fetch(BASE+'/b/'+BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JKEY},body:JSON.stringify(data)}).catch(function(){showToast('⚠️ 서버 저장 실패');});
 }
 function serverLoad(cb){
@@ -1418,6 +1443,17 @@ async function callAI(msg){var messages=aiHistory.filter(function(m){return m.ro
 function addAiMsg(role,content){aiHistory.push({role:role,content:content});localStorage.setItem('gymv3_ai',JSON.stringify(aiHistory));renderAiChat();}
 async function sendAiMsg(){var input=document.getElementById('ai-input'),msg=input.value.trim();if(!msg)return;input.value='';addAiMsg('user',msg);var el=document.getElementById('ai-chat-list');var ld=document.createElement('div');ld.id='ai-loading';ld.innerHTML='<div style="display:flex;gap:8px;align-items:center;"><div style="width:28px;height:28px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;">🐻</div><div style="padding:10px;background:var(--bg3);border-radius:12px;font-size:.82rem;color:var(--sub);">분석 중... ⏳</div></div>';el.appendChild(ld);el.scrollTop=el.scrollHeight;try{var reply=await callAI(msg);var l=document.getElementById('ai-loading');if(l)l.remove();addAiMsg('assistant',reply);}catch(e){var l=document.getElementById('ai-loading');if(l)l.remove();addAiMsg('assistant','죄송해요 😅');}}
 function quickAnalysis(msg){document.getElementById('ai-input').value=msg;sendAiMsg();}
+
+
+var monthlyGoals=JSON.parse(localStorage.getItem('gymv3_goals')||'{}');
+function toggleGoalEdit(){var edit=document.getElementById('goal-edit'),btn=document.getElementById('goal-edit-btn');var ym=calYear+'-'+(calMonth+1);if(edit.style.display==='none'){document.getElementById('goal-textarea').value=monthlyGoals[ym]||'';edit.style.display='';btn.textContent='취소';}else{edit.style.display='none';btn.textContent='수정';}}
+function saveGoal(){var ym=calYear+'-'+(calMonth+1),val=document.getElementById('goal-textarea').value.trim();if(val)monthlyGoals[ym]=val;else delete monthlyGoals[ym];localStorage.setItem('gymv3_goals',JSON.stringify(monthlyGoals));if(!IS_VIEW)serverSave();flash();renderMonthlyGoal();toggleGoalEdit();}
+function renderMonthlyGoal(){var ym=calYear+'-'+(calMonth+1),goal=monthlyGoals[ym]||'';var view=document.getElementById('goal-view'),btn=document.getElementById('goal-edit-btn');if(!view)return;if(goal){view.textContent=goal;view.style.color='var(--text)';btn.textContent='수정';}else{view.textContent='이번달 목표를 설정해보세요 🎯';view.style.color='var(--sub)';btn.textContent='작성';}}
+var dailyNotes=JSON.parse(localStorage.getItem('gymv3_notes')||'{}');
+var currentNoteDate='';
+function renderDailyNote(dateStr){currentNoteDate=dateStr;var card=document.getElementById('daily-note-card'),view=document.getElementById('daily-note-view'),btn=document.getElementById('daily-note-edit-btn'),dateLabel=document.getElementById('daily-note-date'),input=document.getElementById('daily-note-input'),edit=document.getElementById('daily-note-edit');if(!card)return;card.style.display='';var parts=dateStr.split('-');dateLabel.textContent=parts[1]+'월 '+parts[2]+'일';var note=dailyNotes[dateStr]||'';if(note){view.textContent=note;view.style.color='var(--text)';btn.textContent='수정';}else{view.textContent='오늘 운동 어떠셨나요? 한줄로 남겨보세요 😊';view.style.color='var(--sub)';btn.textContent='작성';}input.value=note;edit.style.display='none';view.style.display='';}
+function toggleDailyNoteEdit(){var edit=document.getElementById('daily-note-edit'),view=document.getElementById('daily-note-view'),btn=document.getElementById('daily-note-edit-btn');if(edit.style.display==='none'){edit.style.display='';view.style.display='none';btn.textContent='취소';document.getElementById('daily-note-input').focus();}else{edit.style.display='none';view.style.display='';btn.textContent=dailyNotes[currentNoteDate]?'수정':'작성';}}
+function saveDailyNote(){var val=document.getElementById('daily-note-input').value.trim();if(val)dailyNotes[currentNoteDate]=val;else delete dailyNotes[currentNoteDate];localStorage.setItem('gymv3_notes',JSON.stringify(dailyNotes));if(!IS_VIEW)serverSave();flash();renderDailyNote(currentNoteDate);renderCalendar();}
 
 document.getElementById('nut-date-label').textContent=fmtDate(nutDate);
 addSetRow();addSetRow();
