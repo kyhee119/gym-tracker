@@ -978,7 +978,9 @@ function setDaySetting(key, val){
 function calcNutGoals(){
   var curDayMode = getDaySetting('mode', nutMode);
   var curDayWorkout = getDaySetting('workout', nutWorkout);
-  var bw=bodies.length?bodies[bodies.length-1].bw:60;
+  var dk=dateKey(nutDate);
+  var latestBody=getLatestBody(dk);
+  var bw=latestBody?latestBody.bw:60;
   var m=NUT_MODES[curDayMode];
   var bmr=myInfo.gender==='m'?Math.round(10*bw+6.25*myInfo.h-5*myInfo.age+5):Math.round(10*bw+6.25*myInfo.h-5*myInfo.age-161);
   var tdee=curDayWorkout?Math.round(bmr*myInfo.act):Math.round(bmr*1.375);
@@ -986,7 +988,7 @@ function calcNutGoals(){
   var prot=Math.round(bw*m.protMult);
   var fat=Math.round(kcal*0.22/9);
   var carb=Math.max(Math.round((kcal-prot*4-fat*9)/4),0);
-  return {kcal:kcal,prot:prot,carb:carb,fat:fat,tdee:tdee,bmr:bmr};
+  return {kcal:kcal,prot:prot,carb:carb,fat:fat,tdee:tdee,bmr:bmr,bw:bw};
 }
 
 function getNutTotals(){
@@ -1227,7 +1229,8 @@ function saveInfo(){if(IS_VIEW){showToast('👀 보기 전용 모드예요!');re
   sv(IK,myInfo);toggleInfoEdit();renderBodyInfo();flash();
 }
 function renderBodyInfo(){
-  var bw=bodies.length?bodies[bodies.length-1].bw:60;
+  var latestB=getLatestBody(null);
+  var bw=latestB?latestB.bw:60;
   var bmr=myInfo.gender==='m'?Math.round(10*bw+6.25*myInfo.h-5*myInfo.age+5):Math.round(10*bw+6.25*myInfo.h-5*myInfo.age-161);
   var tdeeW=Math.round(bmr*myInfo.act),tdeeR=Math.round(bmr*1.375);
   var prot=Math.round(bw*2.0);
@@ -1444,6 +1447,19 @@ async function callAI(msg){var messages=aiHistory.filter(function(m){return m.ro
 function addAiMsg(role,content){aiHistory.push({role:role,content:content});localStorage.setItem('gymv3_ai',JSON.stringify(aiHistory));renderAiChat();}
 async function sendAiMsg(){var input=document.getElementById('ai-input'),msg=input.value.trim();if(!msg)return;input.value='';addAiMsg('user',msg);var el=document.getElementById('ai-chat-list');var ld=document.createElement('div');ld.id='ai-loading';ld.innerHTML='<div style="display:flex;gap:8px;align-items:center;"><div style="width:28px;height:28px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;">🐻</div><div style="padding:10px;background:var(--bg3);border-radius:12px;font-size:.82rem;color:var(--sub);">분석 중... ⏳</div></div>';el.appendChild(ld);el.scrollTop=el.scrollHeight;try{var reply=await callAI(msg);var l=document.getElementById('ai-loading');if(l)l.remove();addAiMsg('assistant',reply);}catch(e){var l=document.getElementById('ai-loading');if(l)l.remove();addAiMsg('assistant','오류: '+e.message);}}
 function quickAnalysis(msg){document.getElementById('ai-input').value=msg;sendAiMsg();}
+
+
+function getLatestBody(dateStr){
+  if(!bodies.length) return null;
+  var sorted=bodies.slice().sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+  var target=dateStr?new Date(dateStr):new Date();
+  var best=null;
+  for(var i=0;i<sorted.length;i++){
+    if(new Date(sorted[i].date)<=target) best=sorted[i];
+    else break;
+  }
+  return best||sorted[0];
+}
 
 document.getElementById('nut-date-label').textContent=fmtDate(nutDate);
 addSetRow();addSetRow();
