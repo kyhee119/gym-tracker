@@ -890,12 +890,7 @@ function renderWorkouts(){
 function toggleSess(id){var e=document.getElementById(id);if(e)e.classList.toggle('open');}
 
 // ══ 유산소
-function onCardioChange(){
-  var t=document.getElementById('c-type').value;
-  ['c-treadmill','c-stepmill','c-cycle'].forEach(function(id){document.getElementById(id).style.display='none';});
-  if(t) document.getElementById('c-'+t).style.display='';
-  document.getElementById('c-preview').style.display='none';
-}
+function onCardioChange(){var t=document.getElementById('c-type').value;['c-treadmill','c-incline-wrap','c-stepmill','c-cycle'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='none';});document.getElementById('c-preview').style.display='none';if(t==='treadmill')document.getElementById('c-treadmill').style.display='';else if(t==='incline'){var iw=document.getElementById('c-incline-wrap');if(iw)iw.style.display='';}else if(t==='stepmill')document.getElementById('c-stepmill').style.display='';else if(t==='cycle')document.getElementById('c-cycle').style.display='';}
 function cardioPreview(){var t=document.getElementById('c-type').value,el=document.getElementById('c-preview');if(!el)return;if(t==='treadmill'){var s=parseFloat(document.getElementById('c-speed').value)||0,tm=parseFloat(document.getElementById('c-time').value)||0;if(s&&tm){el.style.display='';el.textContent='예상 거리: '+(Math.round(s*tm/60*10)/10)+'km';}else el.style.display='none';}else if(t==='incline'){var inc=parseFloat(document.getElementById('c-incline').value)||0,sp=parseFloat(document.getElementById('c-ispeed').value)||0,ti=parseFloat(document.getElementById('c-itime').value)||0;if(sp&&ti){el.style.display='';el.textContent='경사 '+inc+'° · 예상 거리: '+(Math.round(sp*ti/60*10)/10)+'km';}else el.style.display='none';}else el.style.display='none';}
 function saveCardio(){
   if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}
@@ -915,10 +910,10 @@ function delC(id){if(IS_VIEW){showToast('👀 보기 전용 모드예요!');retu
 function renderCardio(){
   var el=document.getElementById('c-list');
   if(!cardios.length){el.innerHTML='<div class="empty">🏃<br>유산소 기록이 없어요</div>';return;}
-  var groups={treadmill:[],stepmill:[],cycle:[]};cardios.forEach(function(c){if(groups[c.type])groups[c.type].push(c);});
+  var groups={treadmill:[],incline:[],stepmill:[],cycle:[]};cardios.forEach(function(c){if(groups[c.type])groups[c.type].push(c);else groups.treadmill.push(c);});
   var html='';
-  var cardioNames={treadmill:'🏃 런닝머신',stepmill:'🪜 스텝밀',cycle:'🚴 사이클'};
-  ['treadmill','stepmill','cycle'].forEach(function(t){
+  var cardioNames={treadmill:'🏃 런닝머신 (일반)',incline:'🏔️ 런닝머신 (인클라인)',stepmill:'🪜 스텝밀',cycle:'🚴 사이클'};
+  ['treadmill','incline','stepmill','cycle'].forEach(function(t){
     if(!groups[t].length)return;
     var logs=groups[t].slice().sort(function(a,b){return new Date(a.date)-new Date(b.date);});
     var last=logs[logs.length-1],prev=logs.length>1?logs[logs.length-2]:null;
@@ -933,9 +928,9 @@ function renderCardio(){
     }
     var rows=logs.slice().reverse().map(function(c){
       var stats='';
-      if(t==='treadmill')stats='<div class="cst"><span class="cl">인클라인</span><br><span class="cv hi">'+c.incline+'°</span></div><div class="cst"><span class="cl">속도</span><br><span class="cv">'+c.speed+'km/h</span></div><div class="cst"><span class="cl">시간</span><br><span class="cv">'+c.duration+'분</span></div><div class="cst"><span class="cl">거리</span><br><span class="cv" style="color:var(--green)">'+c.dist+'km</span></div>';
-      else if(t==='stepmill')stats='<div class="cst"><span class="cl">강도</span><br><span class="cv hi">Lv.'+c.level+'</span></div><div class="cst"><span class="cl">시간</span><br><span class="cv">'+c.duration+'분</span></div>';
-      else stats='<div class="cst"><span class="cl">저항</span><br><span class="cv hi">Lv.'+c.resistance+'</span></div><div class="cst"><span class="cl">시간</span><br><span class="cv">'+c.duration+'분</span></div>'+(c.dist?'<div class="cst"><span class="cl">거리</span><br><span class="cv" style="color:var(--green)">'+c.dist+'km</span></div>':'');
+      var _tm=c.time||c.duration||0;if(t==='treadmill')stats='<div class="cst"><span class="cl">속도</span><br><span class="cv hi">'+c.speed+'km/h</span></div><div class="cst"><span class="cl">시간</span><br><span class="cv">'+_tm+'분</span></div><div class="cst"><span class="cl">거리</span><br><span class="cv" style="color:var(--green)">'+c.dist+'km</span></div>';
+      else if(t==='incline')stats='<div class="cst"><span class="cl">인클라인</span><br><span class="cv hi">'+(c.incline||0)+'°</span></div><div class="cst"><span class="cl">속도</span><br><span class="cv">'+(c.speed||0)+'km/h</span></div><div class="cst"><span class="cl">시간</span><br><span class="cv">'+_tm+'분</span></div>';else if(t==='stepmill')stats='<div class="cst"><span class="cl">강도</span><br><span class="cv hi">Lv.'+(c.level||0)+'</span></div><div class="cst"><span class="cl">시간</span><br><span class="cv">'+_tm+'분</span></div>';
+      else stats='<div class="cst"><span class="cl">저항</span><br><span class="cv hi">Lv.'+(c.resistance||c.level||0)+'</span></div><div class="cst"><span class="cl">시간</span><br><span class="cv">'+_tm+'분</span></div>'+(c.dist?'<div class="cst"><span class="cl">거리</span><br><span class="cv" style="color:var(--green)">'+c.dist+'km</span></div>':'');
       return '<div class="c-row"><span class="c-date">'+c.date+'</span><div class="c-stats">'+stats+(IS_VIEW?'':'<button class="bdels" onclick="delC('+c.id+')">✕</button>')+'</div></div>';
     }).join('');
     html+='<div class="c-card"><div class="c-hd"><span class="c-name">'+cardioNames[t]+'</span>'+tH+'</div>'+rows+'</div>';
