@@ -897,13 +897,28 @@ function saveCardio(){
   var date=document.getElementById('c-date').value,type=document.getElementById('c-type').value,err=document.getElementById('c-err');
   if(!date||!type){err.textContent='날짜와 종류를 선택해주세요.';return;}
   var entry={id:Date.now(),date:date,type:type};
-  if(type==='treadmill'){var inc=parseFloat(document.getElementById('c-incline').value)||0,spd=parseFloat(document.getElementById('c-speed').value),min=parseFloat(document.getElementById('c-time').value);if(!spd||!min){err.textContent='속도와 시간을 입력해주세요.';return;}entry.incline=inc;entry.speed=spd;entry.duration=min;entry.dist=parseFloat((spd/60*min).toFixed(2));}
-  else if(type==='stepmill'){var lv=parseInt(document.getElementById('c-level').value),min=parseFloat(document.getElementById('c-stime').value);if(!lv||!min){err.textContent='강도와 시간을 입력해주세요.';return;}entry.level=lv;entry.duration=min;}
-  else{var res=parseInt(document.getElementById('c-resistance').value),min=parseFloat(document.getElementById('c-ctime').value),dist=parseFloat(document.getElementById('c-cdist').value)||null;if(!res||!min){err.textContent='저항과 시간을 입력해주세요.';return;}entry.resistance=res;entry.duration=min;if(dist)entry.dist=dist;}
+  if(type==='treadmill'){
+    var spd=parseFloat(document.getElementById('c-speed').value),min=parseFloat(document.getElementById('c-time').value);
+    if(!spd||!min){err.textContent='속도와 시간을 입력해주세요.';return;}
+    entry.speed=spd;entry.time=min;entry.dist=parseFloat((spd/60*min).toFixed(2));
+  } else if(type==='incline'){
+    var inc=parseFloat(document.getElementById('c-incline').value)||0,spd=parseFloat(document.getElementById('c-ispeed').value),min=parseFloat(document.getElementById('c-itime').value);
+    if(!spd||!min){err.textContent='속도와 시간을 입력해주세요.';return;}
+    entry.incline=inc;entry.speed=spd;entry.time=min;entry.dist=parseFloat((spd/60*min).toFixed(2));
+  } else if(type==='stepmill'){
+    var lv=parseInt(document.getElementById('c-level').value),min=parseFloat(document.getElementById('c-stime').value);
+    if(!lv||!min){err.textContent='강도와 시간을 입력해주세요.';return;}
+    entry.level=lv;entry.time=min;
+  } else {
+    var res=parseInt(document.getElementById('c-resistance').value),min=parseFloat(document.getElementById('c-ctime').value),dist=parseFloat(document.getElementById('c-cdist').value)||null;
+    if(!res||!min){err.textContent='저항과 시간을 입력해주세요.';return;}
+    entry.resistance=res;entry.time=min;if(dist)entry.dist=dist;
+  }
   err.textContent='';cardios.push(entry);sv(CK,cardios);
-  document.getElementById('c-type').value='';['c-treadmill','c-stepmill','c-cycle'].forEach(function(id){document.getElementById(id).style.display='none';});
+  document.getElementById('c-type').value='';
+  ['c-treadmill','c-incline-wrap','c-stepmill','c-cycle'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='none';});
   document.getElementById('c-preview').style.display='none';
-  ['c-incline','c-speed','c-time','c-level','c-stime','c-resistance','c-ctime','c-cdist'].forEach(function(id){document.getElementById(id).value='';});
+  ['c-incline','c-speed','c-time','c-ispeed','c-itime','c-level','c-stime','c-resistance','c-ctime','c-cdist'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   if(!IS_VIEW)serverSave();flash();renderCardio();
 }
 function delC(id){if(IS_VIEW){showToast('👀 보기 전용 모드예요!');return;}if(!confirm('삭제할까요?'))return;cardios=cardios.filter(function(c){return c.id!==id;});sv(CK,cardios);if(!IS_VIEW)serverSave();renderCardio();}
