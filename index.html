@@ -1041,8 +1041,12 @@ function switchNut(t,btn){
   if(t==='add')renderSavedSelect();
   if(t==='saved')renderSavedList();
   if(t==='goal')renderNutGoal();
+
+  if(t==='add'&&typeof updateNutAddDate==='function') updateNutAddDate();
 }
-function changeNutDay(dir){nutDate=new Date(nutDate);nutDate.setDate(nutDate.getDate()+dir);document.getElementById('nut-date-label').textContent=fmtDate(nutDate);renderNutToday();renderNutGoal();}
+function changeNutDay(dir){nutDate=new Date(nutDate);nutDate.setDate(nutDate.getDate()+dir);document.getElementById('nut-date-label').textContent=fmtDate(nutDate);renderNutToday();renderNutGoal();
+  if(typeof updateNutAddDate==='function') updateNutAddDate();
+}
 
 function getDaySetting(key, def){
   var dk=dateKey(nutDate);
@@ -1252,9 +1256,14 @@ function renderCalendar(){
   };
   if(calSelected) renderDayDetail(calSelected);
 
+
+  if(typeof renderMonthlyGoal==='function') renderMonthlyGoal();
 }
 
-function selectDay(dateStr){calSelected=dateStr;renderCalendar();renderDayDetail(dateStr);}
+function selectDay(dateStr){calSelected=dateStr;renderCalendar();renderDayDetail(dateStr);
+  if(typeof renderDailyNote==='function') renderDailyNote(dateStr);
+  if(typeof renderMonthlyGoal==='function') renderMonthlyGoal();
+}
 function renderDayDetail(dateStr){
   var el=document.getElementById('day-detail');
   var ws=workouts.filter(function(w){return w.date===dateStr;}),cs=cardios.filter(function(c){return c.date===dateStr;});
@@ -1421,7 +1430,7 @@ function updDisp(){var m=Math.floor(tLeft/60),s=tLeft%60;document.getElementById
 // ══ 서버 저장 & 공유
 function showToast(msg,dur){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#222;color:#eee;padding:10px 18px;border-radius:20px;font-size:.8rem;z-index:999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.4);';document.body.appendChild(t);setTimeout(function(){t.remove();},dur||2500);}
 function serverSave(){
-  var data={workouts:workouts,cardios:cardios,bodies:bodies,nutMeals:nutMeals,myInfo:myInfo,savedFoods:savedFoods};
+  var data={workouts:workouts,cardios:cardios,bodies:bodies,nutMeals:nutMeals,myInfo:myInfo,savedFoods:savedFoods,dailyNotes:(typeof dailyNotes!=='undefined'?dailyNotes:{}),monthlyGoals:(typeof monthlyGoals!=='undefined'?monthlyGoals:{})};
   fetch(BASE+'/b/'+BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JKEY},body:JSON.stringify(data)}).catch(function(){showToast('⚠️ 서버 저장 실패');});
 }
 function serverLoad(cb){
@@ -1553,15 +1562,15 @@ async function sendAiMsg(){var input=document.getElementById('ai-input'),msg=inp
 function quickAnalysis(msg){document.getElementById('ai-input').value=msg;sendAiMsg();}
 
 // ── 원본 함수들 오버라이드 (selectDay, renderCalendar, changeNutDay, switchNut, serverSave)
-var _sd=selectDay;selectDay=function(d){_sd(d);renderDailyNote(d);renderMonthlyGoal();};
-var _rc=renderCalendar;renderCalendar=function(){_rc();renderMonthlyGoal();};
-var _cnd=changeNutDay;changeNutDay=function(dir){_cnd(dir);updateNutAddDate();};
-var _sn=switchNut;switchNut=function(t,btn){_sn(t,btn);if(t==='add')updateNutAddDate();};
-var _ss=serverSave;serverSave=function(){var data={workouts:workouts,cardios:cardios,bodies:bodies,nutMeals:nutMeals,myInfo:myInfo,savedFoods:savedFoods,dailyNotes:dailyNotes,monthlyGoals:monthlyGoals};fetch(BASE+'/b/'+BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JKEY},body:JSON.stringify(data)}).catch(function(){showToast('⚠️ 서버 저장 실패');});};
+
+
+
+
+
 
 // ── renderWorkouts 오버라이드 (부위별 탭)
 var _rw=renderWorkouts;
-renderWorkouts=function(){
+renderWorkouts=function(){try{
   var el=document.getElementById('w-list');
   var groups={};
   workouts.forEach(function(w){if(!groups[w.ex])groups[w.ex]=[];groups[w.ex].push(w);});
@@ -1578,6 +1587,7 @@ renderWorkouts=function(){
     var histRows=logs.slice().reverse().map(function(w){var setStr=w.sets.map(function(s,si){return 'S'+(si+1)+'&nbsp;'+(s.kg&&type!=='bw'?s.kg+'kg×':'')+s.reps+'회';}).join('&nbsp;&nbsp;');var memoTag=w.memo?'<span style="font-size:.62rem;color:var(--blue);background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);border-radius:20px;padding:1px 6px;margin-left:4px;">'+w.memo+'</span>':'';var vol=w.totalVol?'<span style="color:var(--green);font-size:.7rem;font-weight:700;">'+w.totalVol.toLocaleString()+'kg</span>':'';return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:.76rem;"><div><div style="color:var(--sub);margin-bottom:2px;">'+w.date+memoTag+'</div><div>'+setStr+'</div></div>'+vol+'</div>';}).join('');
     return '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden;"><div style="padding:11px 13px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;" data-wex="'+ex+'"><div><div style="font-size:.88rem;font-weight:900;display:flex;align-items:center;gap:5px;"><span class="cat-dot '+catCls+'" style="display:inline-block;"></span>'+ex+'</div><div style="font-size:.68rem;color:var(--sub);margin-top:2px;">최근: '+last.date+'&nbsp;&nbsp;세션 '+logs.length+'회</div></div>'+olHTML+'</div>'+(isOpen?'<div style="padding:0 13px 10px;">'+histRows+'</div>':'')+'</div>';
   }).join('');
+  }catch(e){_rw();}
 };
 
 // ── renderCardio 오버라이드 (인클라인 + undefined분 수정)
