@@ -490,6 +490,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
   <div id="nut-add" style="display:none">
     <div class="card">
       <div class="chd">저장된 음식에서 추가</div>
+      <div id="nut-add-date-label" style="font-size:.75rem;color:var(--green);font-weight:700;background:rgba(0,255,157,.08);border:1px solid rgba(0,255,157,.2);border-radius:6px;padding:3px 9px;margin-bottom:8px;">오늘 식사 기록</div>
       <div class="g2">
         <div class="fl full"><label>저장된 음식</label><select id="saved-select" onchange="onSavedSelect()"><option value="">직접 입력</option></select></div>
         <div class="fl full"><label>섭취량 (g)</label><input type="number" id="intake-gram" placeholder="140" oninput="calcFromGram()"/></div>
@@ -958,6 +959,7 @@ function renderCardio(){
 // ══ 영양
 function switchNut(t,btn){
   ['today','goal','add','saved'].forEach(function(id){document.getElementById('nut-'+id).style.display='none';});
+  if(t==='add'){var el=document.getElementById('nut-add-date-label');if(el){var tod=new Date(),isToday=nutDate.getFullYear()===tod.getFullYear()&&nutDate.getMonth()===tod.getMonth()&&nutDate.getDate()===tod.getDate();el.textContent=(isToday?'오늘':'📅 '+fmtDate(nutDate))+' 식사 기록';}}
   document.getElementById('nut-'+t).style.display='';
   document.querySelectorAll('.stab').forEach(function(b){b.classList.remove('on');});
   btn.classList.add('on');
@@ -965,7 +967,7 @@ function switchNut(t,btn){
   if(t==='saved')renderSavedList();
   if(t==='goal')renderNutGoal();
 }
-function changeNutDay(dir){nutDate=new Date(nutDate);nutDate.setDate(nutDate.getDate()+dir);document.getElementById('nut-date-label').textContent=fmtDate(nutDate);renderNutToday();renderNutGoal();}
+function changeNutDay(dir){nutDate=new Date(nutDate);nutDate.setDate(nutDate.getDate()+dir);document.getElementById('nut-date-label').textContent=fmtDate(nutDate);renderNutToday();renderNutGoal();var el=document.getElementById('nut-add-date-label');if(el){var tod=new Date(),isToday=nutDate.getFullYear()===tod.getFullYear()&&nutDate.getMonth()===tod.getMonth()&&nutDate.getDate()===tod.getDate();el.textContent=(isToday?'오늘':'📅 '+fmtDate(nutDate))+' 식사 기록';}}
 
 function getDaySetting(key, def){
   var dk=dateKey(nutDate);
