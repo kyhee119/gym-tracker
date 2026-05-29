@@ -629,7 +629,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 <div id="tab-ai" style="display:none"><div class="card" style="background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(99,102,241,.05));border-color:rgba(167,139,250,.2);"><div style="display:flex;align-items:center;gap:10px;"><div style="width:38px;height:38px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">🐻</div><div><div style="font-size:.9rem;font-weight:900;color:#fff;">AI코치</div><div style="font-size:.68rem;color:var(--sub);">운동·영양·체성분 종합 분석</div></div></div></div><div class="card"><div class="chd">빠른 분석</div><div style="display:flex;flex-wrap:wrap;gap:7px;"><button class="badd" style="flex:none;padding:9px 14px;border-style:solid;border-color:rgba(167,139,250,.3);color:var(--purple);" onclick="quickAnalysis('오늘 종합 분석해줘')">📊 오늘 종합</button><button class="badd" style="flex:none;padding:9px 14px;border-style:solid;border-color:rgba(167,139,250,.3);color:var(--purple);" onclick="quickAnalysis('이번주 운동 리뷰해줘')">🏋️ 이번주</button><button class="badd" style="flex:none;padding:9px 14px;border-style:solid;border-color:rgba(167,139,250,.3);color:var(--purple);" onclick="quickAnalysis('영양 피드백 해줘')">🥗 영양</button><button class="badd" style="flex:none;padding:9px 14px;border-style:solid;border-color:rgba(167,139,250,.3);color:var(--purple);" onclick="quickAnalysis('체성분 변화 분석해줘')">⚖️ 체성분</button></div></div><div style="display:flex;justify-content:flex-end;margin-bottom:6px;"><button onclick="clearAiChat()" style="font-size:.65rem;color:var(--sub);background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 8px;cursor:pointer;">🗑️ 대화 삭제</button></div>
   <div id="ai-chat-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:10px;"></div><div style="display:flex;gap:8px;align-items:center;position:sticky;bottom:calc(10px + env(safe-area-inset-bottom));"><input id="ai-input" type="text" placeholder="AI코치에게 물어보세요..." style="flex:1;background:var(--bg2);border:1px solid rgba(167,139,250,.3);color:var(--text);border-radius:20px;padding:11px 16px;font-size:.85rem;outline:none;font-family:inherit;" onkeydown="if(event.key==='Enter')sendAiMsg()"/><button onclick="sendAiMsg()" style="width:40px;height:40px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:50%;color:#fff;font-size:1rem;cursor:pointer;">↑</button></div></div></div><!-- /app -->
 
-<button class="share-btn" id="share-btn" onclick="shareData()" style="display:none">📤 기록 공유</button>
+<button class="share-btn" id="share-btn" onclick="shareData()">📤 기록 공유</button>
 <div class="overlay" id="overlay" onclick="closeTimer()"></div>
 
 <!-- 타이머 팝업 -->
@@ -1450,7 +1450,7 @@ function patchViewMode(){
 }
 function shareData(){
   serverSave();
-  var url=window.location.origin+window.location.pathname+'?share='+BIN_ID;
+  var url=window.location.origin+window.location.pathname+'?share='+GIST_ID;
   if(navigator.share){navigator.share({title:'내 헬스 기록',text:'운동 기록을 확인해보세요! 💪',url:url}).catch(function(){});}
   else if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){showToast('링크 복사 완료! 카톡에 붙여넣기 하세요 📋');});}
   else prompt('아래 링크를 복사하세요:',url);
