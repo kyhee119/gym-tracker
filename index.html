@@ -328,7 +328,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 <div class="appbar">
   <div class="appbar-row">
     <button class="menu-btn" onclick="openMenu()">☰</button><h1>🐻 GYM <em>TRACKER</em></h1>
-    <div style="display:flex;align-items:center;gap:8px;"><span id="saved">✓ 저장됨</span><button onclick="manualSave()" style="padding:5px 12px;background:var(--green);color:#080808;border:none;border-radius:6px;font-size:.72rem;font-weight:900;cursor:pointer;">💾 저장</button></div>
+    <div style="display:flex;align-items:center;gap:8px;"><span id="saved">✓ 저장됨</span><button onclick="syncFromServer()" style="padding:5px 12px;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:6px;font-size:.72rem;font-weight:900;cursor:pointer;">🔄</button><button onclick="manualSave()" style="padding:5px 12px;background:var(--green);color:#080808;border:none;border-radius:6px;font-size:.72rem;font-weight:900;cursor:pointer;">💾 저장</button></div>
   </div>
 </div>
 <div id="view-banner" class="view-banner" style="display:none">👀 보기 전용 모드</div>
@@ -1372,6 +1372,21 @@ function serverSave(){
   var data={workouts:workouts,cardios:cardios,bodies:bodies,nutMeals:nutMeals,myInfo:myInfo,savedFoods:savedFoods};
   var content=JSON.stringify(data);
   fetch(GIST_BASE,{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'token '+GIST_TOKEN},body:JSON.stringify({files:{'gymdata.json':{content:content}}})}).then(function(r){if(!r.ok)showToast('⚠️ 서버 저장 실패');}).catch(function(){showToast('⚠️ 서버 저장 실패');});
+}
+
+function syncFromServer(){
+  showToast('🔄 최신 데이터 불러오는 중...');
+  serverLoad(function(data){
+    var changed=false;
+    if(data.workouts&&JSON.stringify(data.workouts)!==JSON.stringify(workouts)){workouts=data.workouts;sv(WK,workouts);changed=true;}
+    if(data.cardios&&JSON.stringify(data.cardios)!==JSON.stringify(cardios)){cardios=data.cardios;sv(CK,cardios);changed=true;}
+    if(data.bodies&&JSON.stringify(data.bodies)!==JSON.stringify(bodies)){bodies=data.bodies;sv(BK,bodies);changed=true;}
+    if(data.nutMeals&&JSON.stringify(data.nutMeals)!==JSON.stringify(nutMeals)){nutMeals=data.nutMeals;sv(NK,nutMeals);changed=true;}
+    if(data.myInfo&&JSON.stringify(data.myInfo)!==JSON.stringify(myInfo)){myInfo=data.myInfo;sv(IK,myInfo);changed=true;}
+    if(data.savedFoods&&JSON.stringify(data.savedFoods)!==JSON.stringify(savedFoods)){savedFoods=data.savedFoods;sv(FK,savedFoods);changed=true;}
+    if(changed){renderWorkouts();renderCardio();renderBody();renderBodyInfo();renderNutToday();showToast('✅ 최신 데이터로 업데이트됐어요!');}
+    else{showToast('✅ 이미 최신 데이터예요!');}
+  });
 }
 function serverLoad(cb){
   fetch(GIST_BASE,{headers:{'Authorization':'token '+GIST_TOKEN}}).then(function(r){return r.json();}).then(function(r){
